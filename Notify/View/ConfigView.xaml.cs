@@ -19,17 +19,9 @@ namespace ProductivityTool.Notify.View
             {
                 DirectoryLog.Text = message;
             };
-            Action<MatchedApplicationInfo> updateAppInfoAction = (info) =>
-            {
-                ApplicationManager.Instance.MatchedAppInfos.Add(info);
-            };
             updater.DirectoryFieldUpdated = message =>
             {
                 Dispatcher.BeginInvoke(directoryUpdateAction, message);
-            };
-            updater.MatchedAppUpdate = info =>
-            {
-                Dispatcher.BeginInvoke(updateAppInfoAction, info);
             };
             ViewModel = new ConfigurationViewModel(updater, ApplicationManager.Instance);
 

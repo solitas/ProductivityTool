@@ -1,4 +1,5 @@
-﻿using DynamicData.Annotations;
+﻿using System.Collections.Generic;
+using DynamicData.Annotations;
 using ProductivityTool.Notify.Model;
 using ReactiveUI;
 using System.Collections.ObjectModel;
@@ -9,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using DynamicData;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace ProductivityTool.Notify.ViewModel
@@ -18,7 +20,7 @@ namespace ProductivityTool.Notify.ViewModel
         private const int MaxCountOfRootPath = 3;
 
         private readonly IComponentUpdater _componentUpdater;
-        
+
         private string _userInputAppName;
         private string _userInputRootPath;
         private string _userSelectAppName;
@@ -28,9 +30,13 @@ namespace ProductivityTool.Notify.ViewModel
         {
             _componentUpdater = updater;
             Manager = manager;
-           
 
-            UpdateApp = ReactiveCommand.Create(UpdateApplications);
+
+            UpdateApp = ReactiveCommand.Create(async () =>
+            {
+                var result = await UpdateApplications();
+                manager.MatchedAppInfos.AddRange(result);
+            });
             ResetAppInfo = ReactiveCommand.Create(ResetApplication);
 
             var canAddApp = this.WhenAnyValue(x => x.UserInputAppName)
@@ -42,14 +48,14 @@ namespace ProductivityTool.Notify.ViewModel
                 .Select(x => !string.IsNullOrEmpty(x));
             var canRemoveRootPath = this.WhenAnyValue(x => x.UserSelectRootPath)
                 .Select(x => !string.IsNullOrEmpty(x));
-           
+
             AddApplication = ReactiveCommand.Create(() =>
             {
                 AddApp(UserInputAppName);
                 UserInputAppName = string.Empty;
             }, canAddApp);
-            
-            RemoveApplication = ReactiveCommand.Create(() => { RemoveApp(UserSelectAppName);}, canRemoveApp);
+
+            RemoveApplication = ReactiveCommand.Create(() => { RemoveApp(UserSelectAppName); }, canRemoveApp);
 
             AddRootPath = ReactiveCommand.Create(() =>
             {
@@ -93,7 +99,7 @@ namespace ProductivityTool.Notify.ViewModel
                 }
             });
         }
-       
+
         public ApplicationManager Manager { get; set; }
         public string UserInputAppName
         {
@@ -123,8 +129,12 @@ namespace ProductivityTool.Notify.ViewModel
         public ICommand RemoveApplication { get; set; }
         public ICommand SelectPath { get; set; }
 
-        private async Task UpdateApplications()
+        private async Task<List<MatchedApplicationInfo>> UpdateApplications()
         {
+            var result = new List<MatchedApplicationInfo>();
+            
+            ResetApplication();
+
             foreach (var root in Manager.RootPaths)
             {
                 foreach (var appName in Manager.ApplicationNames)
@@ -133,18 +143,15 @@ namespace ProductivityTool.Notify.ViewModel
                         .ContinueWith(t =>
                         {
                             var file = t.Result;
-                            var appInfo = GetExistsAppInfo(appName);
-                            if (appInfo != null)
+                            if (!string.IsNullOrEmpty(file))
                             {
-                                appInfo.File = file;
-                            }
-                            else
-                            {
-                                SetAppInfo(appName, file);
+                                var newAppInfo = SetAppInfo(appName, file);
+                                result.Add(newAppInfo);
                             }
                         });
                 }
             }
+            return result;
         }
         private void ResetApplication()
         {
@@ -164,7 +171,7 @@ namespace ProductivityTool.Notify.ViewModel
                 Manager.ApplicationNames.Remove(appName);
             }
         }
-        private void SetAppInfo(string appName, string file)
+        private MatchedApplicationInfo SetAppInfo(string appName, string file)
         {
             if (Manager.MatchedAppInfos.All(appInfo => appInfo.ApplicationName != appName))
             {
@@ -173,8 +180,10 @@ namespace ProductivityTool.Notify.ViewModel
                     ApplicationName = appName,
                     File = file
                 };
-                _componentUpdater.UpdateInfo(newAppInfo);
+                return newAppInfo;
             }
+
+            return null;
         }
         private MatchedApplicationInfo GetExistsAppInfo([NotNull]string appName)
         {

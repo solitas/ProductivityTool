@@ -67,21 +67,34 @@ namespace ProductivityTool.Notify.ViewModel
 
         private static void FileSearch(List<string> fileFound, string dir, string searchPattern, IComponentUpdater updater = null)
         {
-            var directories = Directory.GetDirectories(dir);
-
-            foreach (var directory in directories)
+            try
             {
-                updater?.Update(directory);
-
-                var files = Directory.GetFiles(directory, searchPattern);
-                foreach (var file in files)
+                var directories = Directory.GetDirectories(dir);
+                
+                foreach (var directory in directories)
                 {
-                    if (Regex.IsMatch(file, searchPattern))
+                    updater?.Update(directory);
+                    try
                     {
-                        fileFound.Add(file);
+                        var files = Directory.GetFiles(directory, searchPattern);
+                        foreach (var file in files)
+                        {
+                            if (Regex.IsMatch(file, searchPattern))
+                            {
+                                fileFound.Add(file);
+                            }
+                        }
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        Console.WriteLine(@"2.권한 없는 폴더임 {0}", directory);
                     }
                     FileSearch(fileFound, directory, searchPattern);
                 }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Console.WriteLine(@"1.권한 없는 폴더임 {0}", dir);
             }
         }
 

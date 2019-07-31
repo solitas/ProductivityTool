@@ -1,12 +1,10 @@
-﻿using System;
-using System.Diagnostics;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using ProductivityTool.Notify.Model;
+using ProductivityTool.Notify.ViewModel;
+using System;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using ProductivityTool.Notify.Model;
 
 namespace ProductivityTool.Notify
 {
@@ -45,7 +43,7 @@ namespace ProductivityTool.Notify
 
             TaskbarIcon.ContextMenu.Items.Add(new Separator());
             TaskbarIcon.ContextMenu.Items.Add(configurationMenuItem);
-            
+
             Loaded += MainWindow_Loaded;
             Closing += MainWindow_Closing;
         }
@@ -115,9 +113,10 @@ namespace ProductivityTool.Notify
             }
         }
 
-        private void CheckButtonClicked(object sender, RoutedEventArgs e)
+        private async void CheckButtonClicked(object sender, RoutedEventArgs e)
         {
             var fileName = ApplicationName.Text;
+
             if (string.IsNullOrEmpty(_rootPath))
             {
                 MessageBox.Show("Root Path cannot be empty");
@@ -135,55 +134,72 @@ namespace ProductivityTool.Notify
                 MessageBox.Show("Root Path is not exists");
                 return;
             }
-
-            Task.Run(() =>
+            CheckButton.IsEnabled = false;
+            var searchFileService = new SearchFileService(_rootPath, fileName);
+            await searchFileService.RunAsync().ContinueWith(t =>
             {
-                var maxTime = DateTime.MinValue;
-                var maxApp = string.Empty;
-                var maxApp2 = string.Empty;
-
-                var dirs = Directory.GetDirectories(_rootPath);
-
-                var maxVersion = 0;
-
-                foreach (var dir in dirs)
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    var files = Directory.GetFiles(dir, "*.exe", SearchOption.AllDirectories);
-                    var targetExecuteFiles = files.Where(x => x.Contains(fileName));
-
-                    foreach (var targetFile in targetExecuteFiles)
+                    if (!string.IsNullOrEmpty(t.Result))
                     {
-                        var info = new FileInfo(targetFile);
-
-                        var versionInfo = FileVersionInfo.GetVersionInfo(targetFile);
-                        var version = versionInfo.ProductBuildPart + versionInfo.ProductMajorPart +
-                                      versionInfo.ProductMinorPart + versionInfo.ProductPrivatePart;
-                        if (maxVersion < version)
-                        {
-                            maxVersion = version;
-                            maxApp2 = targetFile;
-                        }
-                        if (maxTime < info.LastWriteTime)
-                        {
-                            maxTime = info.LastWriteTime;
-                            maxApp = targetFile;
-                        }
-                    }
-                }
-
-                var targetApp = maxApp2 == maxApp ? maxApp2 : maxApp;
-
-                if (!string.IsNullOrEmpty(targetApp))
-                {
-                    Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        _tempContext = new ExeAppContext(targetApp);
+                        _tempContext = new ExeAppContext(t.Result);
                         FileInfoBox.Text = _tempContext.ToString();
-                    }));
-                }
+
+                        CheckButton.IsEnabled = true;
+                    }
+                }));
             });
+
+           
+
+            //Task.Run(() =>
+            //{
+            //    var maxTime = DateTime.MinValue;
+            //    var maxApp = string.Empty;
+            //    var maxApp2 = string.Empty;
+
+            //    var dirs = Directory.GetDirectories(_rootPath);
+
+            //    var maxVersion = 0;
+
+            //    foreach (var dir in dirs)
+            //    {
+            //        var files = Directory.GetFiles(dir, "*.exe", SearchOption.AllDirectories);
+            //        var targetExecuteFiles = files.Where(x => x.Contains(fileName));
+
+            //        foreach (var targetFile in targetExecuteFiles)
+            //        {
+            //            var info = new FileInfo(targetFile);
+
+            //            var versionInfo = FileVersionInfo.GetVersionInfo(targetFile);
+            //            var version = versionInfo.ProductBuildPart + versionInfo.ProductMajorPart +
+            //                          versionInfo.ProductMinorPart + versionInfo.ProductPrivatePart;
+            //            if (maxVersion < version)
+            //            {
+            //                maxVersion = version;
+            //                maxApp2 = targetFile;
+            //            }
+            //            if (maxTime < info.LastWriteTime)
+            //            {
+            //                maxTime = info.LastWriteTime;
+            //                maxApp = targetFile;
+            //            }
+            //        }
+            //    }
+
+            //    var targetApp = maxApp2 == maxApp ? maxApp2 : maxApp;
+
+            //    if (!string.IsNullOrEmpty(targetApp))
+            //    {
+            //        Dispatcher.BeginInvoke(new Action(() =>
+            //        {
+            //            _tempContext = new ExeAppContext(targetApp);
+            //            FileInfoBox.Text = _tempContext.ToString();
+            //        }));
+            //    }
+            //});
         }
- 
+
         private void AddContext(object sender, RoutedEventArgs e)
         {
             if (_tempContext != null)

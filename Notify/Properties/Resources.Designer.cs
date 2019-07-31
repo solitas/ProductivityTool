@@ -59,5 +59,14 @@ namespace ProductivityTool.Notify.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   AppInfo.Config과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string ConfigurationFile {
+            get {
+                return ResourceManager.GetString("ConfigurationFile", resourceCulture);
+            }
+        }
     }
 }

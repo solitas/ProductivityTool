@@ -1,0 +1,62 @@
+﻿<reactiveui:ReactiveWindow x:TypeArguments="viewmodel:IConfigurationViewModel"
+                           xmlns:reactiveui="http://reactiveui.net"
+                           x:Class="ProductivityTool.Notify.View.ConfigView"
+                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:local="clr-namespace:ProductivityTool.Notify.View"
+                           xmlns:viewmodel="clr-namespace:ProductivityTool.Notify.ViewModel"
+                           mc:Ignorable="d"
+                           Title="ConfigView" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Label Content="RootPaths" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
+        <ItemsControl x:Name="RootPathItems" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderThickness="1" BorderBrush="Gray" Background="#898989" Margin="1">
+                        <Grid>
+                            <TextBlock Text="{Binding}"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Label Content="Applications" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"/>
+        <ItemsControl x:Name="AppNameItems" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderThickness="1" BorderBrush="Gray" Background="#898989" Margin="1">
+                        <Grid>
+                            <TextBlock Text="{Binding}"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        
+        <Label Content="RootPath" Grid.Row="4" Grid.Column="0"/>
+        <TextBox x:Name="UserInputRootPath" Grid.Row="4" Grid.Column="1" Margin="5" Height="26"
+                 VerticalContentAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="False"/>
+        <Button x:Name="SelectPathButton" Content="Path" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right" Width="50" Height="20" Margin="8"></Button>
+        <Button x:Name="AddRootPath" Content="Add"  Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"/>
+        <Label Content="AppName" Grid.Row="6" Grid.Column="0"/>
+        <TextBox x:Name="UserInputAppName" Grid.Row="6" Grid.Column="1" Margin="5" Height="26"
+                 VerticalContentAlignment="Center"/>
+        <Button x:Name="AddApplication" Content="Add"  Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2"/>
+    </Grid>
+</reactiveui:ReactiveWindow>

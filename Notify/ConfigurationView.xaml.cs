@@ -135,8 +135,14 @@ namespace ProductivityTool.Notify
                 return;
             }
             CheckButton.IsEnabled = false;
-            var searchFileService = new SearchFileService(_rootPath, fileName);
-            await searchFileService.RunAsync().ContinueWith(t =>
+            DirectoryNameUpdater updater = new DirectoryNameUpdater
+            {
+                InvokeUpdate = (message) =>
+                {
+                    Dispatcher.BeginInvoke(new Action(() => { FileInfoBox.Text = message; }));
+                }
+            };
+            await FileService.SearchAsync(_rootPath, fileName, updater).ContinueWith(t =>
             {
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
@@ -144,13 +150,12 @@ namespace ProductivityTool.Notify
                     {
                         _tempContext = new ExeAppContext(t.Result);
                         FileInfoBox.Text = _tempContext.ToString();
-
-                        CheckButton.IsEnabled = true;
                     }
+                    CheckButton.IsEnabled = true;
                 }));
             });
 
-           
+
 
             //Task.Run(() =>
             //{

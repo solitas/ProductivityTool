@@ -132,25 +132,24 @@ namespace ProductivityTool.Notify.ViewModel
         private async Task<List<MatchedApplicationInfo>> UpdateApplications()
         {
             var result = new List<MatchedApplicationInfo>();
-            
+
             ResetApplication();
 
-            foreach (var root in Manager.RootPaths)
+
+            foreach (var appName in Manager.ApplicationNames)
             {
-                foreach (var appName in Manager.ApplicationNames)
-                {
-                    await FileService.SearchAsync(root, appName, _componentUpdater)
-                        .ContinueWith(t =>
-                        {
-                            var file = t.Result;
-                            if (!string.IsNullOrEmpty(file))
-                            {
-                                var newAppInfo = SetAppInfo(appName, file);
-                                result.Add(newAppInfo);
-                            }
-                        });
-                }
+                await FileService.SearchAsync(Manager.RootPaths, appName, _componentUpdater)
+                                 .ContinueWith(t =>
+                                 {
+                                     var file = t.Result;
+                                     if (!string.IsNullOrEmpty(file))
+                                     {
+                                         var newAppInfo = SetAppInfo(appName, file);
+                                         result.Add(newAppInfo);
+                                     }
+                                 });
             }
+
             return result;
         }
         private void ResetApplication()

@@ -142,18 +142,18 @@ namespace ProductivityTool.Notify
                     Dispatcher.BeginInvoke(new Action(() => { FileInfoBox.Text = message; }));
                 }
             };
-            await FileService.SearchAsync(_rootPath, fileName, updater).ContinueWith(t =>
-            {
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    if (!string.IsNullOrEmpty(t.Result))
-                    {
-                        _tempContext = new ExeAppContext(t.Result);
-                        FileInfoBox.Text = _tempContext.ToString();
-                    }
-                    CheckButton.IsEnabled = true;
-                }));
-            });
+//            await FileService.SearchAsync(_rootPath, fileName, updater).ContinueWith(t =>
+//            {
+//                Dispatcher.BeginInvoke(new Action(() =>
+//                {
+//                    if (!string.IsNullOrEmpty(t.Result))
+//                    {
+//                        _tempContext = new ExeAppContext(t.Result);
+//                        FileInfoBox.Text = _tempContext.ToString();
+//                    }
+//                    CheckButton.IsEnabled = true;
+//                }));
+//            });
 
 
 

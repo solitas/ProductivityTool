@@ -12,37 +12,41 @@ namespace ProductivityTool.Notify.ViewModel
     public static class FileService
     {
         // last write time 기준으로 Search
-        public static async Task<string> SearchAsync(string root, string searchPattern, IComponentUpdater updater = null)
+        
+        public static async Task<string> SearchAsync(ICollection<string> roots, string searchPattern, IComponentUpdater updater = null)
         {
             try
             {
                 return await Task.Factory.StartNew(() =>
-                 {
-                     var rootIsExist = Directory.Exists(root);
+                {
+                    var listFileFound = new List<string>();
 
-                     if (rootIsExist)
-                     {
-                         var listFileFound = new List<string>();
+                    foreach (var root in roots)
+                    {
+                        var rootIsExist = Directory.Exists(root);
 
-                         FileSearch(listFileFound, root, searchPattern, updater);
+                        if (rootIsExist)
+                        {
+                            FileSearch(listFileFound, root, searchPattern, updater);
+                        }
+                    }
 
-                         var maxLastWriteTime = DateTime.MinValue;
-                         var lastWriteFile = string.Empty;
 
-                         foreach (var file in listFileFound)
-                         {
-                             FileInfo fileInfo = new FileInfo(file);
-                             if (fileInfo.LastWriteTime > maxLastWriteTime)
-                             {
-                                 maxLastWriteTime = fileInfo.LastWriteTime;
-                                 lastWriteFile = file;
-                             }
-                         }
+                    var maxLastWriteTime = DateTime.MinValue;
+                    var lastWriteFile = string.Empty;
 
-                         return lastWriteFile;
-                     }
-                     return string.Empty;
-                 });
+                    foreach (var file in listFileFound)
+                    {
+                        FileInfo fileInfo = new FileInfo(file);
+                        if (fileInfo.LastWriteTime > maxLastWriteTime)
+                        {
+                            maxLastWriteTime = fileInfo.LastWriteTime;
+                            lastWriteFile = file;
+                        }
+                    }
+
+                    return lastWriteFile;
+                });
             }
             catch
             {
@@ -70,7 +74,7 @@ namespace ProductivityTool.Notify.ViewModel
             try
             {
                 var directories = Directory.GetDirectories(dir);
-                
+
                 foreach (var directory in directories)
                 {
                     updater?.Update(directory);

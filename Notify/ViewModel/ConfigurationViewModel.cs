@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -14,40 +15,14 @@ namespace ProductivityTool.Notify.ViewModel
 {
     public class ConfigurationViewModel : ReactiveObject, IConfigurationViewModel
     {
-        private const string ConfigFile = "Configuration";
         private const int MaxCountOfRootPath = 3;
+
         private readonly IComponentUpdater _componentUpdater;
         
         private string _userInputAppName;
-
-        public ApplicationManager Manager { get; set; }
-
-        public string UserInputAppName
-        {
-            get => _userInputAppName;
-            set => this.RaiseAndSetIfChanged(ref _userInputAppName, value);
-        }
-        
         private string _userInputRootPath;
-        public string UserInputRootPath
-        {
-            get => _userInputRootPath;
-            set => this.RaiseAndSetIfChanged(ref _userInputRootPath, value);
-        }
-        
         private string _userSelectAppName;
-        public string UserSelectAppName
-        {
-            get => _userSelectAppName;
-            set => this.RaiseAndSetIfChanged(ref _userSelectAppName, value);
-        }
-        
         private string _userSelectRootPath;
-        public string UserSelectRootPath
-        {
-            get => _userSelectRootPath;
-            set => this.RaiseAndSetIfChanged(ref _userSelectRootPath, value);
-        }
 
         public ConfigurationViewModel(IComponentUpdater updater, ApplicationManager manager)
         {
@@ -118,12 +93,28 @@ namespace ProductivityTool.Notify.ViewModel
                 }
             });
         }
-//
-//        public ObservableCollection<string> RootPaths => Manager.RootPaths;
-//        public ObservableCollection<string> ApplicationNames => Manager.ApplicationNames;
-//        public ObservableCollection<MatchedApplicationInfo> MatchedAppInfos => Manager.MatchedAppInfos;
-
-
+       
+        public ApplicationManager Manager { get; set; }
+        public string UserInputAppName
+        {
+            get => _userInputAppName;
+            set => this.RaiseAndSetIfChanged(ref _userInputAppName, value);
+        }
+        public string UserInputRootPath
+        {
+            get => _userInputRootPath;
+            set => this.RaiseAndSetIfChanged(ref _userInputRootPath, value);
+        }
+        public string UserSelectAppName
+        {
+            get => _userSelectAppName;
+            set => this.RaiseAndSetIfChanged(ref _userSelectAppName, value);
+        }
+        public string UserSelectRootPath
+        {
+            get => _userSelectRootPath;
+            set => this.RaiseAndSetIfChanged(ref _userSelectRootPath, value);
+        }
         public ICommand UpdateApp { get; set; }
         public ICommand ResetAppInfo { get; set; }
         public ICommand AddApplication { get; set; }
@@ -131,7 +122,8 @@ namespace ProductivityTool.Notify.ViewModel
         public ICommand RemoveRootPath { get; set; }
         public ICommand RemoveApplication { get; set; }
         public ICommand SelectPath { get; set; }
-        private async void UpdateApplications()
+
+        private async Task UpdateApplications()
         {
             foreach (var root in Manager.RootPaths)
             {
@@ -181,14 +173,15 @@ namespace ProductivityTool.Notify.ViewModel
                     ApplicationName = appName,
                     File = file
                 };
-                Manager.MatchedAppInfos.Add(newAppInfo);
+                _componentUpdater.UpdateInfo(newAppInfo);
             }
         }
         private MatchedApplicationInfo GetExistsAppInfo([NotNull]string appName)
         {
             return Manager.MatchedAppInfos.SingleOrDefault(x => x.ApplicationName == appName);
         }
-        private bool FileNameFormatCheck(string appName)
+
+        private static bool FileNameFormatCheck(string appName)
         {
             return !Regex.IsMatch(appName, @"^(?!.*\.exe$).*$");
         }

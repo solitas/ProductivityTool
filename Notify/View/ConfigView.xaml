@@ -8,55 +8,79 @@
                            xmlns:local="clr-namespace:ProductivityTool.Notify.View"
                            xmlns:viewmodel="clr-namespace:ProductivityTool.Notify.ViewModel"
                            mc:Ignorable="d"
-                           Title="ConfigView" Height="450" Width="800">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="150"/>
-            <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
-        <Label Content="RootPaths" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
-        <ItemsControl x:Name="RootPathItems" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border BorderThickness="1" BorderBrush="Gray" Background="#898989" Margin="1">
-                        <Grid>
-                            <TextBlock Text="{Binding}"/>
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-        <Label Content="Applications" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"/>
-        <ItemsControl x:Name="AppNameItems" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border BorderThickness="1" BorderBrush="Gray" Background="#898989" Margin="1">
-                        <Grid>
-                            <TextBlock Text="{Binding}"/>
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-        
-        <Label Content="RootPath" Grid.Row="4" Grid.Column="0"/>
-        <TextBox x:Name="UserInputRootPath" Grid.Row="4" Grid.Column="1" Margin="5" Height="26"
+                           Title="ConfigView" Height="450" Width="500">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Height="30">
+            <Button x:Name="UpdateButton" Content="Update" Margin="5"/>
+            <Button x:Name="ResetButton" Content="Reset" Margin="5"/>
+        </StackPanel>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="39"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Label Content="RootPaths" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
+            <ItemsControl x:Name="RootPathItems" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderThickness="1" BorderBrush="Gray" Background="#898989" Margin="1">
+                            <Grid>
+                                <TextBlock Text="{Binding}"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Label Content="Applications" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"/>
+            <ItemsControl x:Name="AppNameItems" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderThickness="1" BorderBrush="Gray" Background="#898989" Margin="1">
+                            <Grid>
+                                <TextBlock Text="{Binding}"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Label Content="RootPath" Grid.Row="4" Grid.Column="0"/>
+            <TextBox x:Name="UserInputRootPath" Grid.Row="4" Grid.Column="1" Margin="5" Height="26"
                  VerticalContentAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="False"/>
-        <Button x:Name="SelectPathButton" Content="Path" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right" Width="50" Height="20" Margin="8"></Button>
-        <Button x:Name="AddRootPath" Content="Add"  Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"/>
-        <Label Content="AppName" Grid.Row="6" Grid.Column="0"/>
-        <TextBox x:Name="UserInputAppName" Grid.Row="6" Grid.Column="1" Margin="5" Height="26"
+            <Button x:Name="SelectPathButton" Content="Path" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right" Width="50" Height="20" Margin="8"></Button>
+            <Button x:Name="AddRootPath" Content="Add"  Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"/>
+            <Label Content="AppName" Grid.Row="6" Grid.Column="0"/>
+            <TextBox x:Name="UserInputAppName" Grid.Row="6" Grid.Column="1" Margin="5" Height="26"
                  VerticalContentAlignment="Center"/>
-        <Button x:Name="AddApplication" Content="Add"  Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2"/>
-    </Grid>
+            <Button x:Name="AddApplication" Content="Add"  Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2"/>
+
+            <TextBox x:Name="DirectoryLog" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" VerticalContentAlignment="Center" Padding="3,0,0,0" TextWrapping="WrapWithOverflow"/>
+            <Label Content="Matched App" Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2"/>
+            <ItemsControl x:Name="MatchedAppItems" Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderThickness="1" BorderBrush="Gray" Background="#898989" Margin="1">
+                            <Grid>
+                                <TextBlock Text="{Binding File}"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+    </DockPanel>
+    
 </reactiveui:ReactiveWindow>

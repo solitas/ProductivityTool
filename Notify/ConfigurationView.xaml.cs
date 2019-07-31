@@ -137,7 +137,7 @@ namespace ProductivityTool.Notify
             CheckButton.IsEnabled = false;
             DirectoryNameUpdater updater = new DirectoryNameUpdater
             {
-                InvokeUpdate = (message) =>
+                DirectoryFieldUpdated = (message) =>
                 {
                     Dispatcher.BeginInvoke(new Action(() => { FileInfoBox.Text = message; }));
                 }

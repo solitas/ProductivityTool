@@ -21,7 +21,7 @@
             
             <Label x:Name="ListLabel" Grid.Column="0" Content="Application List" Margin="0" Padding="5" Background="#FF144F70" Foreground="White" FontWeight="ExtraBold" Grid.ColumnSpan="3"/>
             <ScrollViewer Grid.Row="1">
-                <ItemsControl x:Name="AppContexts" Padding="3" >
+                <ListView x:Name="AppContexts" Padding="3" >
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="{x:Type model:ExeAppContext}">
                             <Border BorderBrush="DimGray" BorderThickness="0 0.5 0 0.5" Background="White">
@@ -41,7 +41,7 @@
                             </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                </ListView>
             </ScrollViewer>
         </Grid>
         

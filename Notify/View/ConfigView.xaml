@@ -1,19 +1,25 @@
-﻿<reactiveui:ReactiveWindow x:TypeArguments="viewmodel:IConfigurationViewModel"
+﻿<reactiveui:ReactiveWindow
                            xmlns:reactiveui="http://reactiveui.net"
-                           x:Class="ProductivityTool.Notify.View.ConfigView"
                            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                            xmlns:local="clr-namespace:ProductivityTool.Notify.View"
                            xmlns:viewmodel="clr-namespace:ProductivityTool.Notify.ViewModel"
+                           xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls" x:TypeArguments="viewmodel:IConfigurationViewModel"
+                           x:Class="ProductivityTool.Notify.View.ConfigView"
                            mc:Ignorable="d"
-                           Title="ConfigView" Height="450" Width="500">
+                           SizeToContent="Height"
+                           Title="Configuration" Height="Auto" Width="500">
     <DockPanel>
-        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Height="30">
-            <Button x:Name="UpdateButton" Content="Update" Margin="5"/>
-            <Button x:Name="ResetButton" Content="Reset" Margin="5"/>
-        </StackPanel>
+        <Grid DockPanel.Dock="Bottom" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="UpdateButton" Content="Update" Grid.Column="0" Style="{StaticResource AccentedSquareButtonStyle}" BorderThickness="1" Margin="0 0 1 0"/>
+            <Button x:Name="ResetButton" Content="Reset" Grid.Column="1"  Style="{DynamicResource SquareButtonStyle}" BorderThickness="1"/>
+        </Grid>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -32,55 +38,57 @@
                 <ColumnDefinition Width="150"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <Label Content="RootPaths" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
-            <ItemsControl x:Name="RootPathItems" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
-                <ItemsControl.ItemTemplate>
+            <Label Content="RootPaths" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
+                   FontWeight="Bold"
+                   Background="{DynamicResource AccentColorBrush}" 
+                   Foreground="{DynamicResource WhiteBrush}"/>
+            <ListView x:Name="RootPathItems" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BorderThickness="0">
+                <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderThickness="1" BorderBrush="Gray" Background="#898989" Margin="1">
-                            <Grid>
-                                <TextBlock Text="{Binding}"/>
-                            </Grid>
-                        </Border>
+                        <Grid>
+                            <TextBlock Text="{Binding}" FontSize="10"/>
+                        </Grid>
                     </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-            <Label Content="Applications" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"/>
-            <ItemsControl x:Name="AppNameItems" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
-                <ItemsControl.ItemTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Label Content="Applications" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"  FontWeight="Bold"
+                   Background="{DynamicResource AccentColorBrush}" 
+                   Foreground="{DynamicResource WhiteBrush}"/>
+            <ListView x:Name="AppNameItems" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" BorderThickness="0">
+                <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderThickness="1" BorderBrush="Gray" Background="#898989" Margin="1">
-                            <Grid>
-                                <TextBlock Text="{Binding}"/>
-                            </Grid>
-                        </Border>
+                        <Grid>
+                            <TextBlock Text="{Binding}" FontSize="10"/>
+                        </Grid>
                     </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                </ListView.ItemTemplate>
+            </ListView>
 
             <Label Content="RootPath" Grid.Row="4" Grid.Column="0"/>
-            <TextBox x:Name="UserInputRootPath" Grid.Row="4" Grid.Column="1" Margin="5" Height="26"
+            <TextBox x:Name="UserInputRootPath" Grid.Row="4" Grid.Column="1" Margin="5"
                  VerticalContentAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="False"/>
-            <Button x:Name="SelectPathButton" Content="Path" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right" Width="50" Height="20" Margin="8"></Button>
+            <Button x:Name="SelectPathButton" Content="Path" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right" Margin="8"/>
             <Button x:Name="AddRootPath" Content="Add"  Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"/>
             <Label Content="AppName" Grid.Row="6" Grid.Column="0"/>
-            <TextBox x:Name="UserInputAppName" Grid.Row="6" Grid.Column="1" Margin="5" Height="26"
+            <TextBox x:Name="UserInputAppName" Grid.Row="6" Grid.Column="1" Margin="5"
                  VerticalContentAlignment="Center"/>
             <Button x:Name="AddApplication" Content="Add"  Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2"/>
 
             <TextBox x:Name="DirectoryLog" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" VerticalContentAlignment="Center" Padding="3,0,0,0" TextWrapping="WrapWithOverflow"/>
-            <Label Content="Matched App" Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2"/>
-            <ItemsControl x:Name="MatchedAppItems" Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2">
-                <ItemsControl.ItemTemplate>
+            <Label Content="Matched App" Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" 
+                   FontWeight="Bold"
+                   Background="{DynamicResource AccentColorBrush}" 
+                   Foreground="{DynamicResource WhiteBrush}"/>
+            <ListView x:Name="MatchedAppItems" Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" BorderThickness="0">
+                <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderThickness="1" BorderBrush="Gray" Background="#898989" Margin="1">
-                            <Grid>
-                                <TextBlock Text="{Binding OriginalFile}"/>
-                            </Grid>
-                        </Border>
+                        <Grid>
+                            <TextBlock Text="{Binding OriginalFile}" FontSize="10"/>
+                        </Grid>
                     </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                </ListView.ItemTemplate>
+            </ListView>
         </Grid>
     </DockPanel>
-    
+
 </reactiveui:ReactiveWindow>

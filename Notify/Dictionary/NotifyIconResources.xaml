@@ -3,10 +3,24 @@
                     xmlns:tb="http://www.hardcodet.net/taskbar"
                     xmlns:viewMode="clr-namespace:ProductivityTool.Notify.ViewModel">
 
-    <ContextMenu x:Shared="false" x:Key="SysTrayMenu">
-        <MenuItem Header="Configuration" Command="{Binding Configuration}"/>
-        <Separator/>
-        <MenuItem Header="Exit" Command="{Binding ExitApplication}" />
+    <ContextMenu x:Shared="false" x:Key="SysTrayMenu" ItemsSource="{Binding Menus}">
+        <ContextMenu.ItemContainerStyle>
+            <Style TargetType="{x:Type MenuItem}">
+                <Setter Property="Command" Value="{Binding Command}" />
+                <Setter Property="Icon" Value="{Binding Icon}"></Setter>
+            </Style>
+        </ContextMenu.ItemContainerStyle>
+        <ContextMenu.ItemTemplate>
+            <HierarchicalDataTemplate DataType="{x:Type viewMode:ContextMenuItemViewModel}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Header}" Margin="5"/>
+                </StackPanel>
+                
+            </HierarchicalDataTemplate>
+        </ContextMenu.ItemTemplate>
+        <!-- <MenuItem Header="Configuration" Command="{Binding Configuration}"/> -->
+        <!-- <Separator/> -->
+        <!-- <MenuItem Header="Exit" Command="{Binding ExitApplication}" /> -->
     </ContextMenu>
     
     <tb:TaskbarIcon x:Key="NotifyIcon"

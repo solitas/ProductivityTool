@@ -140,10 +140,11 @@
     </ApplicationDefinition>
     <Compile Include="AppBootstrapper.cs" />
     <Compile Include="Model\ApplicationModel.cs" />
+    <Compile Include="Model\MatchedApplicationInfo.cs" />
     <Compile Include="ViewModel\ConfigurationViewModel.cs" />
-    <Compile Include="ViewModel\DirectoryNameUpdater.cs" />
-    <Compile Include="ViewModel\FileService.cs" />
-    <Compile Include="ViewModel\IComponentUpdater.cs" />
+    <Compile Include="DirectoryNameUpdater.cs" />
+    <Compile Include="FileService.cs" />
+    <Compile Include="IComponentUpdater.cs" />
     <Compile Include="ViewModel\IConfigurationViewModel.cs" />
     <Compile Include="ViewModel\NotifyIconViewModel.cs" />
     <Compile Include="View\ConfigView.xaml.cs">

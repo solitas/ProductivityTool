@@ -150,6 +150,12 @@ namespace ProductivityTool.Notify.ViewModel
                                  });
             }
 
+            //TODO: 동기로 동작해서 ui block이 발생함, 추후 비동기로 변경해야 함
+            foreach (var appInfo in result)
+            {
+                Manager.CopyApplication(appInfo);
+            }
+
             return result;
         }
         private void ResetApplication()
@@ -177,7 +183,7 @@ namespace ProductivityTool.Notify.ViewModel
                 var newAppInfo = new MatchedApplicationInfo()
                 {
                     ApplicationName = appName,
-                    File = file
+                    OriginalFile = file
                 };
                 return newAppInfo;
             }

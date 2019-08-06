@@ -74,7 +74,7 @@
                     <DataTemplate>
                         <Border BorderThickness="1" BorderBrush="Gray" Background="#898989" Margin="1">
                             <Grid>
-                                <TextBlock Text="{Binding File}"/>
+                                <TextBlock Text="{Binding OriginalFile}"/>
                             </Grid>
                         </Border>
                     </DataTemplate>

@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Diagnostics;
+using System.Reflection;
+using System.Windows.Controls;
 using Hardcodet.Wpf.TaskbarNotification;
 using ProductivityTool.Notify.Model;
 using ProductivityTool.Notify.Properties;
@@ -10,7 +13,7 @@ namespace ProductivityTool.Notify
 {
     public class AppBootstrapper
     {
-        
+        private TaskbarIcon _notifyIcon;   
         public AppBootstrapper(TaskbarIcon notifyIcon)
         {
             Locator.CurrentMutable.RegisterViewsForViewModels(Assembly.GetCallingAssembly());
@@ -18,9 +21,45 @@ namespace ProductivityTool.Notify
 
             FileService.InitializeConfigFile(ApplicationManager.Instance);
 
-            if (notifyIcon == null)
+            if (notifyIcon != null)
             {
+                if (ApplicationManager.Instance.MatchedAppInfos.Count > 0)
+                {
+                    foreach (var app in ApplicationManager.Instance.MatchedAppInfos)
+                    {
+                        if (app.CheckValidation())
+                        {
+                            app.Execute = () =>
+                            {
+                                try
+                                {
+                                    Process.Start(new ProcessStartInfo(app.ExecuteFile));
+                                }
+                                catch
+                                {
 
+                                }
+                            };
+
+                            var image = new Image
+                            {
+                                Source = FileToImageIconConverter.Icon(app.ExecuteFile)
+                            };
+                            var menuItem = new MenuItem
+                            {
+                                Header = app.ApplicationName,
+                                ToolTip = app.ApplicationName,
+                                Icon = image
+                            };
+                            menuItem.Click += (o, e) => app.Execute();
+                            
+                            if (notifyIcon.ContextMenu != null)
+                            {
+                                notifyIcon.ContextMenu.Items.Add(menuItem);
+                            }
+                        }
+                    }
+                }
             }
         }
         public IConfigurationViewModel ConfigViewModel { get; set; }
@@ -28,8 +67,7 @@ namespace ProductivityTool.Notify
         
         public void Close()
         {
-            FileService.SaveConfigurationFile(Resources.ConfigurationFile, ApplicationManager.Instance.RootPaths,
-                ApplicationManager.Instance.ApplicationNames);
+            FileService.SaveConfigurationFile(Resources.ConfigurationFile, ApplicationManager.Instance.RootPaths, ApplicationManager.Instance.ApplicationNames, ApplicationManager.Instance.MatchedAppInfos);
         }
     }
 }

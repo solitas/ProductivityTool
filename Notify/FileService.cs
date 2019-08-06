@@ -66,7 +66,7 @@ namespace ProductivityTool.Notify.ViewModel
                 doc.Save(Resources.ConfigurationFile);
             }
 
-            LoadConfigurationFile(Resources.ConfigurationFile, manager.RootPaths, manager.ApplicationNames);
+            LoadConfigurationFile(Resources.ConfigurationFile, manager.RootPaths, manager.ApplicationNames, manager.MatchedAppInfos);
         }
 
         private static void FileSearch(List<string> fileFound, string dir, string searchPattern, IComponentUpdater updater = null)
@@ -102,11 +102,12 @@ namespace ProductivityTool.Notify.ViewModel
             }
         }
 
-        public static bool SaveConfigurationFile(string filePath, ICollection<string> rootPaths, ICollection<string> appNames)
+        public static bool SaveConfigurationFile(string filePath, ICollection<string> rootPaths, ICollection<string> appNames, ICollection<MatchedApplicationInfo> infos)
         {
             var rootElement = new XElement("Configuration");
             rootElement.Add(MakeCollectionElement("RootPaths", "RootPath", rootPaths));
             rootElement.Add(MakeCollectionElement("AppNames", "AppName", appNames));
+            rootElement.Add(MakeMatchedAppInfo("AppInfos","AppInfo", infos));
             try
             {
                 var doc = new XDocument();
@@ -120,7 +121,21 @@ namespace ProductivityTool.Notify.ViewModel
             }
         }
 
-        public static bool LoadConfigurationFile(string filePath, ICollection<string> rootPaths, ICollection<string> appNames)
+        private static XElement MakeMatchedAppInfo(string parentName, string childName, ICollection<MatchedApplicationInfo> infos)
+        {
+            var parent = new XElement(parentName);
+            foreach (var item in infos)
+            {
+                XElement child = new XElement(childName, 
+                    new XElement("AppName", item.ApplicationName),
+                    new XElement("OrgFile", item.OriginalFile),
+                    new XElement("ExeFile", item.ExecuteFile));
+                parent.Add(child);
+            }
+            return parent;
+        }
+
+        public static bool LoadConfigurationFile(string filePath, ICollection<string> rootPaths, ICollection<string> appNames, ICollection<MatchedApplicationInfo> infos)
         {
             try
             {
@@ -129,7 +144,7 @@ namespace ProductivityTool.Notify.ViewModel
 
                 var rootPathsElement = doc.Root.Element("RootPaths");
                 var appNamesElement = doc.Root.Element("AppNames");
-
+                var appInfoElement = doc.Root.Element("AppInfos");
                 if (rootPathsElement != null)
                 {
                     foreach (var e in rootPathsElement.Elements("RootPath"))
@@ -146,7 +161,34 @@ namespace ProductivityTool.Notify.ViewModel
                         appNames.Add(e.Value);
                     }
                 }
+                if (appInfoElement != null)
+                {
+                    foreach (var e in appInfoElement.Elements("AppInfo"))
+                    {
+                        var matchedAppInfo = new MatchedApplicationInfo();
+                        var appName = e.Element("AppName");
 
+                        if (appName != null)
+                        {
+                            matchedAppInfo.ApplicationName = appName.Value;
+                        }
+                        var orgFile = e.Element("OrgFile");
+
+                        if (orgFile != null)
+                        {
+                            matchedAppInfo.OriginalFile = orgFile.Value;
+                        }
+                        var exeFile = e.Element("ExeFile");
+
+                        if (exeFile != null)
+                        {
+                            matchedAppInfo.ExecuteFile = exeFile.Value;
+                        }
+
+                        infos.Add(matchedAppInfo);
+                    }
+                }
+                
                 return true;
             }
             catch
@@ -164,6 +206,42 @@ namespace ProductivityTool.Notify.ViewModel
                 parent.Add(child);
             }
             return parent;
+        }
+
+        public static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+        {
+            // Get the subdirectories for the specified directory.
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+
+            if (!dir.Exists)
+            {
+                throw new DirectoryNotFoundException("Source directory does not exist or could not be found: " + sourceDirName);
+            }
+
+            DirectoryInfo[] dirs = dir.GetDirectories();
+            // If the destination directory doesn't exist, create it.
+            if (!Directory.Exists(destDirName))
+            {
+                Directory.CreateDirectory(destDirName);
+            }
+
+            // Get the files in the directory and copy them to the new location.
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                string temppath = Path.Combine(destDirName, file.Name);
+                file.CopyTo(temppath, true);
+            }
+
+            // If copying subdirectories, copy them and their contents to new location.
+            if (copySubDirs)
+            {
+                foreach (DirectoryInfo subdir in dirs)
+                {
+                    string temppath = Path.Combine(destDirName, subdir.Name);
+                    DirectoryCopy(subdir.FullName, temppath, copySubDirs);
+                }
+            }
         }
     }
 }

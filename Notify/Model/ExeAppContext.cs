@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using System.Windows.Controls;
 using System.Xml.Serialization;
-using ReactiveUI;
 
 namespace ProductivityTool.Notify.Model
 {
@@ -99,25 +98,6 @@ namespace ProductivityTool.Notify.Model
             builder.AppendLine($"Version : {FileVersionInfo.FileVersion}");
 
             return builder.ToString();
-        }
-    }
-
-    public class MatchedApplicationInfo : ReactiveObject
-    {
-        private string _applicationName;
-
-        public string ApplicationName
-        {
-            get => _applicationName;
-            set => this.RaiseAndSetIfChanged(ref _applicationName, value);
-        }
-
-        private string _file;
-
-        public string File
-        {
-            get => _file;
-            set => this.RaiseAndSetIfChanged(ref _file, value);
         }
     }
 }

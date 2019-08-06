@@ -14,6 +14,7 @@ namespace ProductivityTool.Notify
             base.OnStartup(e);
 
             var notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
+
             _bootstrapper = new AppBootstrapper(notifyIcon);
         }
         protected override void OnExit(ExitEventArgs e)

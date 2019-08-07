@@ -8,6 +8,7 @@ namespace ProductivityTool.Notify.ViewModel
     public interface IConfigurationViewModel : IReactiveObject
     {
         ApplicationManager Manager { get; set; }
+        ApplicationModel SelectedAppModel { get; set; }
 
         string UserInputAppName { get; set; }
         string UserInputRootPath { get; set; }

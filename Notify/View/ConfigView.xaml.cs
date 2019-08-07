@@ -28,11 +28,11 @@ namespace ProductivityTool.Notify.View
             this.WhenActivated(d =>
             {
                 this.OneWayBind(ViewModel, viewModel => viewModel.Manager.RootPaths, view => view.RootPathItems.ItemsSource);
-                this.OneWayBind(ViewModel, viewModel => viewModel.Manager.ApplicationNames, view => view.AppNameItems.ItemsSource);
+                this.OneWayBind(ViewModel, viewModel => viewModel.Manager.ApplicationModels, view => view.AppNameItems.ItemsSource);
                 this.OneWayBind(ViewModel, viewModel => viewModel.Manager.MatchedAppInfos, view => view.MatchedAppItems.ItemsSource);
                 this.Bind(ViewModel, viewModel => viewModel.UserInputRootPath, view => view.UserInputRootPath.Text);
                 this.Bind(ViewModel, viewModel => viewModel.UserInputAppName, view => view.UserInputAppName.Text);
-
+                this.Bind(ViewModel, viewModel => viewModel.SelectedAppModel, view => view.AppNameItems.SelectedItem);
                 this.BindCommand(ViewModel, viewModel => viewModel.AddRootPath, view => view.AddRootPath);
                 this.BindCommand(ViewModel, viewModel => viewModel.AddApplication, view => view.AddApplication);
                 this.BindCommand(ViewModel, viewModel => viewModel.SelectPath, view => view.SelectPathButton);

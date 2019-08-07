@@ -148,7 +148,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppBootstrapper.cs" />
-    <Compile Include="Model\ApplicationModel.cs" />
+    <Compile Include="Model\ApplicationManager.cs" />
     <Compile Include="Model\MatchedApplicationInfo.cs" />
     <Compile Include="ViewModel\ConfigurationViewModel.cs" />
     <Compile Include="DirectoryNameUpdater.cs" />
@@ -160,20 +160,11 @@
     <Compile Include="View\ConfigView.xaml.cs">
       <DependentUpon>ConfigView.xaml</DependentUpon>
     </Compile>
-    <Page Include="ConfigurationView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="AppContextService.cs" />
     <Compile Include="ImageHelper.cs" />
-    <Compile Include="ConfigurationView.xaml.cs">
-      <DependentUpon>ConfigurationView.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
     <Page Include="Dictionary\NotifyIconResources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -184,8 +175,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model\ExeAppContext.cs" />
-    <Compile Include="Model\ExeAppContextCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

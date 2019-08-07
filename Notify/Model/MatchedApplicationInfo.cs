@@ -7,6 +7,14 @@ namespace ProductivityTool.Notify.Model
 {
     public class MatchedApplicationInfo : ReactiveObject
     {
+        private Guid _applicationId;
+
+        public Guid ApplicationId
+        {
+            get => _applicationId;
+            set => this.RaiseAndSetIfChanged(ref _applicationId, value);
+        }
+
         private string _applicationName;
 
         public string ApplicationName

@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using ProductivityTool.Notify.Model;
 using ProductivityTool.Notify.Properties;
+using ProductivityTool.Notify.ViewModel;
 
-namespace ProductivityTool.Notify.ViewModel
+namespace ProductivityTool.Notify
 {
     public static class FileService
     {
@@ -66,7 +67,7 @@ namespace ProductivityTool.Notify.ViewModel
                 doc.Save(Resources.ConfigurationFile);
             }
 
-            LoadConfigurationFile(Resources.ConfigurationFile, manager.RootPaths, manager.ApplicationNames, manager.MatchedAppInfos);
+            LoadConfigurationFile(Resources.ConfigurationFile, manager.RootPaths, manager.ApplicationModels, manager.MatchedAppInfos);
         }
 
         private static void FileSearch(List<string> fileFound, string dir, string searchPattern, IComponentUpdater updater = null)
@@ -102,11 +103,11 @@ namespace ProductivityTool.Notify.ViewModel
             }
         }
 
-        public static bool SaveConfigurationFile(string filePath, ICollection<string> rootPaths, ICollection<string> appNames, ICollection<MatchedApplicationInfo> infos)
+        public static bool SaveConfigurationFile(string filePath, ICollection<string> rootPaths, ICollection<ApplicationModel> appNames, ICollection<MatchedApplicationInfo> infos)
         {
             var rootElement = new XElement("Configuration");
             rootElement.Add(MakeCollectionElement("RootPaths", "RootPath", rootPaths));
-            rootElement.Add(MakeCollectionElement("AppNames", "AppName", appNames));
+            rootElement.Add(MakeAppModelElement("AppModels", "AppModel", appNames));
             rootElement.Add(MakeMatchedAppInfo("AppInfos","AppInfo", infos));
             try
             {
@@ -121,6 +122,18 @@ namespace ProductivityTool.Notify.ViewModel
             }
         }
 
+        private static XElement MakeAppModelElement(string parentName, string childName, ICollection<ApplicationModel> models)
+        {
+            var parent = new XElement(parentName);
+            foreach (var item in models)
+            {
+                XElement child = new XElement(childName,
+                    new XElement("AppId", item.Id),
+                    new XElement("FileName", item.FileName));
+                parent.Add(child);
+            }
+            return parent;
+        }
         private static XElement MakeMatchedAppInfo(string parentName, string childName, ICollection<MatchedApplicationInfo> infos)
         {
             var parent = new XElement(parentName);
@@ -135,7 +148,7 @@ namespace ProductivityTool.Notify.ViewModel
             return parent;
         }
 
-        public static bool LoadConfigurationFile(string filePath, ICollection<string> rootPaths, ICollection<string> appNames, ICollection<MatchedApplicationInfo> infos)
+        public static bool LoadConfigurationFile(string filePath, ICollection<string> rootPaths, ICollection<ApplicationModel> appNames, ICollection<MatchedApplicationInfo> infos)
         {
             try
             {
@@ -143,7 +156,7 @@ namespace ProductivityTool.Notify.ViewModel
                 if (doc.Root == null) return false;
 
                 var rootPathsElement = doc.Root.Element("RootPaths");
-                var appNamesElement = doc.Root.Element("AppNames");
+                var appNamesElement = doc.Root.Element("AppModels");
                 var appInfoElement = doc.Root.Element("AppInfos");
                 if (rootPathsElement != null)
                 {
@@ -156,9 +169,35 @@ namespace ProductivityTool.Notify.ViewModel
 
                 if (appNamesElement != null)
                 {
-                    foreach (var e in appNamesElement.Elements("AppName"))
+                    foreach (var e in appNamesElement.Elements("AppModel"))
                     {
-                        appNames.Add(e.Value);
+                        
+                        Guid id = Guid.Empty;
+                        
+                        var appId = e.Element("AppId");
+                        if (appId != null)
+                        {
+                            if (!Guid.TryParse(appId.Value, out id))
+                            {
+                                throw new ArgumentException("Id cannot be null");
+                            }
+                            
+                        }
+
+                        string fileName = string.Empty;
+
+                        var fileNameElement = e.Element("FileName");
+                        if (fileNameElement != null)
+                        {
+                            fileName = fileNameElement.Value;
+                        }
+
+                        if (string.IsNullOrEmpty(fileName))
+                        {
+                            throw new ArgumentException("FileName cannot be null");
+                        }
+                        var appModel = new ApplicationModel(id, fileName);
+                        appNames.Add(appModel);
                     }
                 }
                 if (appInfoElement != null)

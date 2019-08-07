@@ -58,7 +58,7 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>
-                            <TextBlock Text="{Binding}" FontSize="10"/>
+                            <TextBlock Text="{Binding FileName}" FontSize="10"/>
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>

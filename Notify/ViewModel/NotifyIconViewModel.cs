@@ -51,6 +51,7 @@ namespace ProductivityTool.Notify.ViewModel
             var instance = ApplicationManager.Instance;
             var observable = instance.MatchedAppInfos
                 .ToObservableChangeSet()
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .ActOnEveryObject(
                     addedItem =>
                     {

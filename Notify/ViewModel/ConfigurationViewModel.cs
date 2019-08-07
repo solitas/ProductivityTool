@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using DynamicData.Annotations;
 using ProductivityTool.Notify.Model;
 using ReactiveUI;
@@ -25,6 +26,7 @@ namespace ProductivityTool.Notify.ViewModel
         private string _userInputRootPath;
         private string _userSelectAppName;
         private string _userSelectRootPath;
+        private ApplicationModel _selectedAppModel;
 
         public ConfigurationViewModel(IComponentUpdater updater, ApplicationManager manager)
         {
@@ -34,9 +36,9 @@ namespace ProductivityTool.Notify.ViewModel
 
             UpdateApp = ReactiveCommand.Create(async () =>
             {
-                var result = await UpdateApplications();
-                manager.MatchedAppInfos.AddRange(result);
+                await UpdateApplications();
             });
+
             ResetAppInfo = ReactiveCommand.Create(ResetApplication);
 
             var canAddApp = this.WhenAnyValue(x => x.UserInputAppName)
@@ -51,11 +53,14 @@ namespace ProductivityTool.Notify.ViewModel
 
             AddApplication = ReactiveCommand.Create(() =>
             {
-                AddApp(UserInputAppName);
+                CreateNewApplicationModel(UserInputAppName);
                 UserInputAppName = string.Empty;
             }, canAddApp);
 
-            RemoveApplication = ReactiveCommand.Create(() => { RemoveApp(UserSelectAppName); }, canRemoveApp);
+            RemoveApplication = ReactiveCommand.Create(() =>
+            {
+                
+            }, canRemoveApp);
 
             AddRootPath = ReactiveCommand.Create(() =>
             {
@@ -121,6 +126,11 @@ namespace ProductivityTool.Notify.ViewModel
             get => _userSelectRootPath;
             set => this.RaiseAndSetIfChanged(ref _userSelectRootPath, value);
         }
+        public ApplicationModel SelectedAppModel
+        {
+            get => _selectedAppModel;
+            set => this.RaiseAndSetIfChanged(ref _selectedAppModel, value);
+        }
         public ICommand UpdateApp { get; set; }
         public ICommand ResetAppInfo { get; set; }
         public ICommand AddApplication { get; set; }
@@ -129,59 +139,32 @@ namespace ProductivityTool.Notify.ViewModel
         public ICommand RemoveApplication { get; set; }
         public ICommand SelectPath { get; set; }
 
-        private async Task<List<MatchedApplicationInfo>> UpdateApplications()
+        private async Task UpdateApplications()
         {
-            var result = new List<MatchedApplicationInfo>();
-
             ResetApplication();
 
-
-            foreach (var appName in Manager.ApplicationNames)
-            {
-                await FileService.SearchAsync(Manager.RootPaths, appName, _componentUpdater)
-                                 .ContinueWith(t =>
-                                 {
-                                     var file = t.Result;
-                                     if (!string.IsNullOrEmpty(file))
-                                     {
-                                         var newAppInfo = SetAppInfo(appName, file);
-                                         result.Add(newAppInfo);
-                                     }
-                                 });
-            }
-
-            //TODO: 동기로 동작해서 ui block이 발생함, 추후 비동기로 변경해야 함
-            foreach (var appInfo in result)
-            {
-                Manager.CopyApplication(appInfo);
-            }
-
-            return result;
+            await Manager.UpdateApplication(_componentUpdater);
         }
         private void ResetApplication()
         {
-            Manager.MatchedAppInfos.Clear();
+            Manager.MatchedAppClear();
         }
-        private void AddApp(string appName)
+        private void CreateNewApplicationModel(string fileName)
         {
-            if (Manager.ApplicationNames.All(name => name != appName))
-            {
-                Manager.ApplicationNames.Add(appName);
-            }
+            Manager.AddNewApplication(fileName);
         }
-        private void RemoveApp(string appName)
+
+        private void RemoveApplicationModel(Guid appId)
         {
-            if (Manager.ApplicationNames.Any(name => name == appName))
-            {
-                Manager.ApplicationNames.Remove(appName);
-            }
+            Manager.RemoveApplication(appId);
         }
-        private MatchedApplicationInfo SetAppInfo(string appName, string file)
+        private MatchedApplicationInfo SetAppInfo(Guid appId, string appName, string file)
         {
             if (Manager.MatchedAppInfos.All(appInfo => appInfo.ApplicationName != appName))
             {
                 var newAppInfo = new MatchedApplicationInfo()
                 {
+                    ApplicationId = appId,
                     ApplicationName = appName,
                     OriginalFile = file
                 };

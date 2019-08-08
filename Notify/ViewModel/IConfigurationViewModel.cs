@@ -1,7 +1,9 @@
 ﻿using ProductivityTool.Notify.Model;
+
+using ReactiveUI;
+
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using ReactiveUI;
 
 namespace ProductivityTool.Notify.ViewModel
 {
@@ -9,7 +11,7 @@ namespace ProductivityTool.Notify.ViewModel
     {
         ApplicationManager Manager { get; set; }
         ApplicationModel SelectedAppModel { get; set; }
-
+        ReadOnlyObservableCollection<MatchedApplication> MatchedItems { get; }
         string UserInputAppName { get; set; }
         string UserInputRootPath { get; set; }
         string UserSelectAppName { get; set; }

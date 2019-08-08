@@ -6,15 +6,15 @@ namespace ProductivityTool.Notify.ViewModel
     public class DirectoryNameUpdater : IComponentUpdater
     {
         public Action<string> DirectoryFieldUpdated { get; set; }
-        public Action<MatchedApplicationInfo> MatchedAppUpdate { get; set; }
+        public Action<MatchedApplication> MatchedAppUpdate { get; set; }
         public void Update(string message)
         {
             DirectoryFieldUpdated?.Invoke(message);
         }
 
-        public void UpdateInfo(MatchedApplicationInfo newAppInfo)
+        public void UpdateInfo(MatchedApplication newApp)
         {
-            MatchedAppUpdate?.Invoke(newAppInfo);
+            MatchedAppUpdate?.Invoke(newApp);
         }
     }
 }

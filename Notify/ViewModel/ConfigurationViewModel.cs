@@ -1,8 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DynamicData;
 using DynamicData.Annotations;
+
+using Microsoft.WindowsAPICodePack.Dialogs;
+
 using ProductivityTool.Notify.Model;
+
 using ReactiveUI;
+
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -11,8 +16,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using DynamicData;
-using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace ProductivityTool.Notify.ViewModel
 {
@@ -28,6 +31,8 @@ namespace ProductivityTool.Notify.ViewModel
         private string _userSelectRootPath;
         private ApplicationModel _selectedAppModel;
 
+        public ReadOnlyObservableCollection<MatchedApplication> MatchedItems { get; }
+
         public ConfigurationViewModel(IComponentUpdater updater, ApplicationManager manager)
         {
             _componentUpdater = updater;
@@ -40,6 +45,13 @@ namespace ProductivityTool.Notify.ViewModel
             });
 
             ResetAppInfo = ReactiveCommand.Create(ResetApplication);
+
+            manager.MatchedAppInfos.Connect()
+                .Filter(app => !(app is ConfigurationMenu) && !(app is ExitMenu))
+                .Bind(out var items)
+                .Subscribe();
+
+            MatchedItems = items;
 
             var canAddApp = this.WhenAnyValue(x => x.UserInputAppName)
                                 .Select(x => !string.IsNullOrEmpty(x) && FileNameFormatCheck(x));
@@ -141,7 +153,7 @@ namespace ProductivityTool.Notify.ViewModel
 
         private async Task UpdateApplications()
         {
-            ResetApplication();
+            //ResetApplication();
 
             await Manager.UpdateApplication(_componentUpdater);
         }
@@ -158,11 +170,11 @@ namespace ProductivityTool.Notify.ViewModel
         {
             Manager.RemoveApplication(appId);
         }
-        private MatchedApplicationInfo SetAppInfo(Guid appId, string appName, string file)
+        private MatchedApplication SetAppInfo(Guid appId, string appName, string file)
         {
-            if (Manager.MatchedAppInfos.All(appInfo => appInfo.ApplicationName != appName))
+            if (Manager.MatchedAppInfos.Items.All(appInfo => appInfo.ApplicationName != appName))
             {
-                var newAppInfo = new MatchedApplicationInfo()
+                var newAppInfo = new MatchedApplication()
                 {
                     ApplicationId = appId,
                     ApplicationName = appName,
@@ -173,9 +185,9 @@ namespace ProductivityTool.Notify.ViewModel
 
             return null;
         }
-        private MatchedApplicationInfo GetExistsAppInfo([NotNull]string appName)
+        private MatchedApplication GetExistsAppInfo([NotNull]string appName)
         {
-            return Manager.MatchedAppInfos.SingleOrDefault(x => x.ApplicationName == appName);
+            return Manager.MatchedAppInfos.Items.SingleOrDefault(x => x.ApplicationName == appName);
         }
 
         private static bool FileNameFormatCheck(string appName)

@@ -16,6 +16,14 @@ namespace ProductivityTool.Notify
             var notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
 
             _bootstrapper = new AppBootstrapper(notifyIcon);
+
+            Interactions.QuestionUpdateApplication.RegisterHandler(context =>
+            {
+                var message = context.Input;
+                var result = MessageBox.Show(message, "question", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+                
+                context.SetOutput(result == MessageBoxResult.Yes);
+            });
         }
         protected override void OnExit(ExitEventArgs e)
         {

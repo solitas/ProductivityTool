@@ -1,34 +1,35 @@
-﻿using ProductivityTool.Notify.ViewModel;
-using ReactiveUI;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using DynamicData;
 using System.Threading.Tasks;
+using DynamicData;
+using ProductivityTool.Notify.Model;
+using ProductivityTool.Notify.ViewModel;
+using ReactiveUI;
 
-namespace ProductivityTool.Notify.Model
+namespace ProductivityTool.Notify
 {
     public class ApplicationManager : ReactiveObject
     {
         private const string RootApplicationDirectory = "Applications\\";
         private static readonly Lazy<ApplicationManager> Lazy = new Lazy<ApplicationManager>(() => new ApplicationManager());
 
-        public ObservableCollection<string> RootPaths { get; }
-        
-        public ObservableCollection<ApplicationModel> ApplicationModels { get; }
-        public ObservableCollection<MatchedApplicationInfo> MatchedAppInfos { get; }
-
         public static ApplicationManager Instance => Lazy.Value;
+
         private ApplicationManager()
         {
             RootPaths = new ObservableCollection<string>();
             
-            MatchedAppInfos = new ObservableCollection<MatchedApplicationInfo>();
+            MatchedAppInfos = new SourceList<MatchedApplication>();
             ApplicationModels = new ObservableCollection<ApplicationModel>();
         }
-        
+
+        public ObservableCollection<string> RootPaths { get; }
+        public ObservableCollection<ApplicationModel> ApplicationModels { get; }
+        public SourceList<MatchedApplication> MatchedAppInfos { get; }
+
         private void CreateDefaultApplicationDirectory()
         {
             try
@@ -40,7 +41,7 @@ namespace ProductivityTool.Notify.Model
             }
             catch
             {
-
+                // ignored
             }
         }
 
@@ -63,9 +64,9 @@ namespace ProductivityTool.Notify.Model
             ApplicationModels.Remove(remove);
         }
 
-        public void InsertMatchedApplication(MatchedApplicationInfo info)
+        public void InsertMatchedApplication(MatchedApplication info)
         {
-            if (MatchedAppInfos.All(i => i.ApplicationId != info.ApplicationId))
+            if (MatchedAppInfos.Items.All(i => i.ApplicationId != info.ApplicationId))
             {
                 var fileInfo = new FileInfo(info.OriginalFile);
                 var dirName = Path.GetFileNameWithoutExtension(info.OriginalFile);
@@ -76,12 +77,14 @@ namespace ProductivityTool.Notify.Model
 
                 Observable.Start(() =>
                 {
+                    info.SetIcon(info.ExecuteFile);
                     MatchedAppInfos.Add(info);
                 }, RxApp.MainThreadScheduler);
             }
             else
             {
-                var targetInfo = MatchedAppInfos.FirstOrDefault(i => i.ApplicationId == info.ApplicationId);
+                
+                var targetInfo = MatchedAppInfos.Items.FirstOrDefault(i => i.ApplicationId == info.ApplicationId);
                 if (targetInfo != null)
                 {
                     targetInfo.OriginalFile = info.OriginalFile;
@@ -95,9 +98,9 @@ namespace ProductivityTool.Notify.Model
             }
         }
 
-        public MatchedApplicationInfo GetMatchedApplicationInfo(Guid id)
+        public MatchedApplication GetMatchedApplicationInfo(Guid id)
         {
-            return MatchedAppInfos.FirstOrDefault(i => i.ApplicationId == id);
+            return MatchedAppInfos.Items.FirstOrDefault(i => i.ApplicationId == id);
         }
 
         public void MatchedAppClear()
@@ -116,19 +119,21 @@ namespace ProductivityTool.Notify.Model
                         if (!string.IsNullOrEmpty(file))
                         {
                             var newAppInfo = CreateMachedApplication(model.Id, model.FileName, file);
-                            InsertMatchedApplication(newAppInfo);
+                            if (newAppInfo != null)
+                                InsertMatchedApplication(newAppInfo);
                         }
                     });
             }
         }
-        private MatchedApplicationInfo CreateMachedApplication(Guid appId, string appName, string file)
+        private MatchedApplication CreateMachedApplication(Guid appId, string fileName, string file)
         {
-            if (MatchedAppInfos.All(appInfo => appInfo.ApplicationName != appName))
+            if (MatchedAppInfos.Items.All(appInfo => appInfo.ApplicationName != fileName))
             {
-                var newAppInfo = new MatchedApplicationInfo()
+                var header = Path.GetFileNameWithoutExtension(fileName);
+                var newAppInfo = new MatchedApplication(header)
                 {
                     ApplicationId = appId,
-                    ApplicationName = appName,
+                    ApplicationName = fileName,
                     OriginalFile = file
                 };
                 return newAppInfo;
@@ -136,26 +141,43 @@ namespace ProductivityTool.Notify.Model
 
             return null;
         }
-    }
-
-    public class ApplicationModel
-    {
-        public Guid Id { get; }
-        public string FileName { get; }
-
-        public ApplicationModel()
+        /// <summary>
+        /// 최신 프로그램이 존재여부를 검사합니다.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns>최신 프로그램이 존재하면 최신파일경로, 그렇지 않으면 string.Empty</returns>
+        public async Task<string> UpdateCheck(MatchedApplication app)
         {
-            Id = Guid.NewGuid();
+            return await FileService.SearchAsync(RootPaths, app.ApplicationName)
+                .ContinueWith(t =>
+                {
+                    var searchedFile = t.Result;
+                    var appFileInfo = new FileInfo(app.ExecuteFile);
+                    var searchedFileInfo = new FileInfo(searchedFile);
+
+                    if (appFileInfo.LastWriteTime < searchedFileInfo.LastWriteTime)
+                    {
+                        return searchedFile;
+                    }
+
+                    return string.Empty;
+                });
         }
-        public ApplicationModel(string fileName) : this()
-        {
-            FileName = fileName;
-        }
 
-        public ApplicationModel(Guid id, string fileName)
+        public void UpdateMatchedApplication(MatchedApplication app, string orgFile)
         {
-            Id = id;
-            FileName = fileName;
+            try
+            {
+                var fileInfo = new FileInfo(orgFile);
+                var applicationDir = Path.GetDirectoryName(app.ExecuteFile);
+
+                FileService.DirectoryCopy(fileInfo.DirectoryName, applicationDir, true);
+                app.OriginalFile = orgFile;
+            }
+            catch
+            {
+
+            }
         }
     }
 }

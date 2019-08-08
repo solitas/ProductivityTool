@@ -1,12 +1,15 @@
-﻿using System;
+﻿using DynamicData;
+
+using ProductivityTool.Notify.Model;
+using ProductivityTool.Notify.Properties;
+using ProductivityTool.Notify.ViewModel;
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using ProductivityTool.Notify.Model;
-using ProductivityTool.Notify.Properties;
-using ProductivityTool.Notify.ViewModel;
 
 namespace ProductivityTool.Notify
 {
@@ -103,7 +106,7 @@ namespace ProductivityTool.Notify
             }
         }
 
-        public static bool SaveConfigurationFile(string filePath, ICollection<string> rootPaths, ICollection<ApplicationModel> appNames, ICollection<MatchedApplicationInfo> infos)
+        public static bool SaveConfigurationFile(string filePath, ICollection<string> rootPaths, ICollection<ApplicationModel> appNames, ISourceList<MatchedApplication> infos)
         {
             var rootElement = new XElement("Configuration");
             rootElement.Add(MakeCollectionElement("RootPaths", "RootPath", rootPaths));
@@ -134,21 +137,28 @@ namespace ProductivityTool.Notify
             }
             return parent;
         }
-        private static XElement MakeMatchedAppInfo(string parentName, string childName, ICollection<MatchedApplicationInfo> infos)
+        private static XElement MakeMatchedAppInfo(string parentName, string childName, ISourceList<MatchedApplication> infos)
         {
             var parent = new XElement(parentName);
-            foreach (var item in infos)
+            foreach (var item in infos.Items)
             {
+                if (item is ConfigurationMenu)
+                    continue;
+
+                if (item is ExitMenu)
+                    continue;
+
                 XElement child = new XElement(childName, 
                     new XElement("AppName", item.ApplicationName),
                     new XElement("OrgFile", item.OriginalFile),
-                    new XElement("ExeFile", item.ExecuteFile));
+                    new XElement("ExeFile", item.ExecuteFile),
+                    new XElement("Header", item.Header));
                 parent.Add(child);
             }
             return parent;
         }
 
-        public static bool LoadConfigurationFile(string filePath, ICollection<string> rootPaths, ICollection<ApplicationModel> appNames, ICollection<MatchedApplicationInfo> infos)
+        public static bool LoadConfigurationFile(string filePath, ICollection<string> rootPaths, ICollection<ApplicationModel> appNames, ISourceList<MatchedApplication> infos)
         {
             try
             {
@@ -204,7 +214,7 @@ namespace ProductivityTool.Notify
                 {
                     foreach (var e in appInfoElement.Elements("AppInfo"))
                     {
-                        var matchedAppInfo = new MatchedApplicationInfo();
+                        var matchedAppInfo = new MatchedApplication();
                         var appName = e.Element("AppName");
 
                         if (appName != null)
@@ -222,8 +232,18 @@ namespace ProductivityTool.Notify
                         if (exeFile != null)
                         {
                             matchedAppInfo.ExecuteFile = exeFile.Value;
+                            if (File.Exists(exeFile.Value))
+                            {
+                                matchedAppInfo.SetIcon(exeFile.Value);
+                            }
                         }
 
+                        var header = e.Element("Header");
+                        if (header != null)
+                        {
+                            matchedAppInfo.Header = header.Value;
+                        }
+                        
                         infos.Add(matchedAppInfo);
                     }
                 }
@@ -268,8 +288,8 @@ namespace ProductivityTool.Notify
             FileInfo[] files = dir.GetFiles();
             foreach (FileInfo file in files)
             {
-                string temppath = Path.Combine(destDirName, file.Name);
-                file.CopyTo(temppath, true);
+                string tempPath = Path.Combine(destDirName, file.Name);
+                file.CopyTo(tempPath, true);
             }
 
             // If copying subdirectories, copy them and their contents to new location.

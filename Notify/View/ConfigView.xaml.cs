@@ -1,8 +1,9 @@
-﻿using System;
-using System.Windows.Threading;
-using ProductivityTool.Notify.Model;
-using ProductivityTool.Notify.ViewModel;
+﻿using ProductivityTool.Notify.ViewModel;
+
 using ReactiveUI;
+
+using System;
+using System.Windows.Threading;
 
 namespace ProductivityTool.Notify.View
 {
@@ -29,7 +30,7 @@ namespace ProductivityTool.Notify.View
             {
                 this.OneWayBind(ViewModel, viewModel => viewModel.Manager.RootPaths, view => view.RootPathItems.ItemsSource);
                 this.OneWayBind(ViewModel, viewModel => viewModel.Manager.ApplicationModels, view => view.AppNameItems.ItemsSource);
-                this.OneWayBind(ViewModel, viewModel => viewModel.Manager.MatchedAppInfos, view => view.MatchedAppItems.ItemsSource);
+                this.OneWayBind(ViewModel, viewModel => viewModel.MatchedItems, view => view.MatchedAppItems.ItemsSource);
                 this.Bind(ViewModel, viewModel => viewModel.UserInputRootPath, view => view.UserInputRootPath.Text);
                 this.Bind(ViewModel, viewModel => viewModel.UserInputAppName, view => view.UserInputAppName.Text);
                 this.Bind(ViewModel, viewModel => viewModel.SelectedAppModel, view => view.AppNameItems.SelectedItem);

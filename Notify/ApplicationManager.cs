@@ -118,14 +118,15 @@ namespace ProductivityTool.Notify
                         var file = t.Result;
                         if (!string.IsNullOrEmpty(file))
                         {
-                            var newAppInfo = CreateMachedApplication(model.Id, model.FileName, file);
+                            var newAppInfo = CreateMatchedApplication(model.Id, model.FileName, file);
                             if (newAppInfo != null)
                                 InsertMatchedApplication(newAppInfo);
                         }
                     });
             }
         }
-        private MatchedApplication CreateMachedApplication(Guid appId, string fileName, string file)
+
+        private MatchedApplication CreateMatchedApplication(Guid appId, string fileName, string file)
         {
             if (MatchedAppInfos.Items.All(appInfo => appInfo.ApplicationName != fileName))
             {

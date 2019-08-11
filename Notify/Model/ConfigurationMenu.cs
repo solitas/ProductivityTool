@@ -4,10 +4,11 @@ using ReactiveUI;
 
 namespace ProductivityTool.Notify.Model
 {
-    public class ConfigurationMenu : MatchedApplication
+    public sealed class ConfigurationMenu : MatchedApplication
     {
         public ConfigurationMenu()
         {
+            Header = "Configuration";
             Command = ReactiveCommand.Create(() =>
             {
                 var configView = new ConfigView { WindowStartupLocation = WindowStartupLocation.CenterScreen };

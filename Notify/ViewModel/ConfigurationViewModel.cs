@@ -31,6 +31,14 @@ namespace ProductivityTool.Notify.ViewModel
         private string _userSelectRootPath;
         private ApplicationModel _selectedAppModel;
 
+        private bool _isUpdating;
+        
+        public bool IsUpdating
+        {
+            get => _isUpdating;
+            set => this.RaiseAndSetIfChanged(ref _isUpdating, value);
+        }
+
         public ReadOnlyObservableCollection<MatchedApplication> MatchedItems { get; }
 
         public ConfigurationViewModel(IComponentUpdater updater, ApplicationManager manager)
@@ -38,13 +46,7 @@ namespace ProductivityTool.Notify.ViewModel
             _componentUpdater = updater;
             Manager = manager;
 
-
-            UpdateApp = ReactiveCommand.Create(async () =>
-            {
-                await UpdateApplications();
-            });
-
-            ResetAppInfo = ReactiveCommand.Create(ResetApplication);
+            
 
             manager.MatchedAppInfos.Connect()
                 .Filter(app => !(app is ConfigurationMenu) && !(app is ExitMenu))
@@ -63,6 +65,16 @@ namespace ProductivityTool.Notify.ViewModel
             var canRemoveRootPath = this.WhenAnyValue(x => x.UserSelectRootPath)
                 .Select(x => !string.IsNullOrEmpty(x));
 
+            var canUpdate = this.WhenAnyValue(x => x.IsUpdating)
+                .Select(x => !x);
+
+            UpdateApp = ReactiveCommand.Create(async () =>
+            {
+                IsUpdating = true;
+                await UpdateApplications();
+                IsUpdating = false;
+            }, canUpdate);
+            ResetAppInfo = ReactiveCommand.Create(ResetApplication, canUpdate);
             AddApplication = ReactiveCommand.Create(() =>
             {
                 CreateNewApplicationModel(UserInputAppName);
@@ -153,8 +165,6 @@ namespace ProductivityTool.Notify.ViewModel
 
         private async Task UpdateApplications()
         {
-            //ResetApplication();
-
             await Manager.UpdateApplication(_componentUpdater);
         }
         private void ResetApplication()

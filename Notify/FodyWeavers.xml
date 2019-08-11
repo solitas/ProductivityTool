@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Weavers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FodyWeavers.xsd" >
+  <Costura>
+    <IncludeAssemblies>
+      DynamicData
+      MahApps.Metro
+      Pharmacist.Common
+      ControlzEx
+      Microsoft.WindowsAPICodePack
+      Microsoft.WindowsAPICodePack.Shell
+      Hardcodet.Wpf.TaskbarNotification
+      ReactiveUI
+      ReactiveUI.Events.WPF
+      ReactiveUI.WPF
+      Splat
+      System.Reactive
+      System.Reactive.Core
+      System.Reactive.Experimental
+      System.Reactive.Interfaces
+      System.Reactive.Providers
+      System.Reactive.Runtime.Remoting
+      System.Windows.Interactivity
+      System.Reactive.Linq
+      System.Reactive.PlatformServices
+      System.Reactive.Windows.Forms
+      System.Reactive.Windows.Threading
+      System.Runtime.CompilerServices.Unsafe
+      System.Threading.Tasks.Extensions
+      System.ValueTuple
+    </IncludeAssemblies>
+  </Costura>
+</Weavers>

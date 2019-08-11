@@ -3,10 +3,11 @@ using ReactiveUI;
 
 namespace ProductivityTool.Notify.Model
 {
-    public class ExitMenu : MatchedApplication
+    public sealed class ExitMenu : MatchedApplication
     {
         public ExitMenu()
         {
+            Header = "Exit";
             Command = ReactiveCommand.Create(() =>
             {
                 Application.Current.Shutdown();

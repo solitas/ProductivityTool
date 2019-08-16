@@ -1,0 +1,26 @@
+﻿<mah:MetroWindow x:Class="ProductivityTool.Notify.View.QuestionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ProductivityTool.Notify.View"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        mc:Ignorable="d"
+        Title="Yes or No" Height="200" Width="300">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="3*"/>
+        </Grid.RowDefinitions>
+        <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" VerticalAlignment="Center" FontFamily="/Notify;component/Resources/#Roboto" FontSize="16" Grid.ColumnSpan="2" Margin="6,36">
+            <Run Text="변경사항이 존재합니다"/> <Run Text="변경하시겠습니까?"/><LineBreak/><Run/>
+        </TextBlock>
+        <Button x:Name="YesButton" Content="Yes" Grid.Row="1" IsDefault="True" Background="#FF8BB8F9" Click="YesButton_Click"/>
+        <Button x:Name="NoButton" Content="No" Grid.Row="1" Grid.Column="1" IsCancel="True" Background="#FFFFC1BF"/>
+
+    </Grid>
+</mah:MetroWindow>

@@ -1,13 +1,14 @@
-﻿using System;
+﻿using DynamicData;
+using ProductivityTool.Notify.Model;
+using ProductivityTool.Notify.ViewModel;
+using ReactiveUI;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using DynamicData;
-using ProductivityTool.Notify.Model;
-using ProductivityTool.Notify.ViewModel;
-using ReactiveUI;
+using System.Windows.Threading;
 
 namespace ProductivityTool.Notify
 {
@@ -21,7 +22,7 @@ namespace ProductivityTool.Notify
         private ApplicationManager()
         {
             RootPaths = new ObservableCollection<string>();
-            
+
             MatchedAppInfos = new SourceList<MatchedApplication>();
             ApplicationModels = new ObservableCollection<ApplicationModel>();
         }
@@ -83,7 +84,7 @@ namespace ProductivityTool.Notify
             }
             else
             {
-                
+
                 var targetInfo = MatchedAppInfos.Items.FirstOrDefault(i => i.ApplicationId == info.ApplicationId);
                 if (targetInfo != null)
                 {
@@ -118,14 +119,15 @@ namespace ProductivityTool.Notify
                         var file = t.Result;
                         if (!string.IsNullOrEmpty(file))
                         {
-                            var newAppInfo = CreateMachedApplication(model.Id, model.FileName, file);
+                            var newAppInfo = CreateMatchedApplication(model.Id, model.FileName, file);
                             if (newAppInfo != null)
                                 InsertMatchedApplication(newAppInfo);
                         }
                     });
             }
         }
-        private MatchedApplication CreateMachedApplication(Guid appId, string fileName, string file)
+
+        private MatchedApplication CreateMatchedApplication(Guid appId, string fileName, string file)
         {
             if (MatchedAppInfos.Items.All(appInfo => appInfo.ApplicationName != fileName))
             {
@@ -177,6 +179,43 @@ namespace ProductivityTool.Notify
             catch
             {
 
+            }
+        }
+        private DispatcherTimer _updateCheckTimer;
+        public void StartUpdateChecker()
+        {
+            _updateCheckTimer = new DispatcherTimer();
+            _updateCheckTimer.Interval = TimeSpan.FromSeconds(10);
+            _updateCheckTimer.Tick += _updateCheckTimer_Tick;
+            _updateCheckTimer.Start();
+        }
+
+        private async void _updateCheckTimer_Tick(object sender, EventArgs e)
+        {
+            foreach (var app in MatchedAppInfos.Items)
+            {
+                if (app is ConfigurationMenu || app is ExitMenu)
+                {
+                    continue;
+                }
+
+                var updateResult = await UpdateCheck(app);
+
+                if (!string.IsNullOrEmpty(updateResult))
+                {
+                    app.Update = new UpdateModel()
+                    {
+                        NeedUpdate = true,
+                        OriginalFile = updateResult
+                    };
+                    app.BadgeValue = 1;
+                    Console.WriteLine($@"Need update application = {app.ApplicationName}");
+                }
+                else
+                {
+                    app.BadgeValue = 0;
+                    app.Update = null;
+                }
             }
         }
     }

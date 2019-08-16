@@ -7,6 +7,7 @@ using ProductivityTool.Notify.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -24,6 +25,13 @@ namespace ProductivityTool.Notify
                 return await Task.Factory.StartNew(() =>
                 {
                     var listFileFound = new List<string>();
+                    var totalSearchDir = 0;
+                    
+                    foreach (var root in roots)
+                    {
+                        var info = new DirectoryInfo(root);
+                        totalSearchDir += info.EnumerateDirectories().Count();
+                    }
 
                     foreach (var root in roots)
                     {
@@ -99,6 +107,7 @@ namespace ProductivityTool.Notify
                     }
                     FileSearch(fileFound, directory, searchPattern);
                 }
+                updater?.Update("");
             }
             catch (UnauthorizedAccessException)
             {

@@ -59,6 +59,9 @@
     <Reference Include="MahApps.Metro, Version=1.6.5.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.1.6.5\lib\net47\MahApps.Metro.dll</HintPath>
     </Reference>
+    <Reference Include="MahApps.Metro.IconPacks, Version=2.3.0.4, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.2.3.0\lib\net46\MahApps.Metro.IconPacks.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.3.3, Culture=neutral, PublicKeyToken=8985beaab7ea3f04, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft-WindowsAPICodePack-Core.1.1.3.3\lib\net452\Microsoft.WindowsAPICodePack.dll</HintPath>
     </Reference>
@@ -154,7 +157,6 @@
     <Compile Include="AppBootstrapper.cs" />
     <Compile Include="ApplicationManager.cs" />
     <Compile Include="Interactions.cs" />
-    <Compile Include="MatchedApplicationComparer.cs" />
     <Compile Include="Model\ApplicationModel.cs" />
     <Compile Include="Model\ConfigurationMenu.cs" />
     <Compile Include="Model\ExitMenu.cs" />
@@ -166,7 +168,11 @@
     <Compile Include="IComponentUpdater.cs" />
     <Compile Include="ViewModel\IConfigurationViewModel.cs" />
     <Compile Include="ViewModel\INotifyIconViewModel.cs" />
+    <Compile Include="MatchedApplicationComparer.cs" />
     <Compile Include="ViewModel\NotifyIconViewModel.cs" />
+    <Compile Include="View\ConfigurationWindow.xaml.cs">
+      <DependentUpon>ConfigurationWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ConfigView.xaml.cs">
       <DependentUpon>ConfigView.xaml</DependentUpon>
     </Compile>
@@ -175,11 +181,33 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ImageHelper.cs" />
+    <Compile Include="View\ApplicationFileSelectView.xaml.cs">
+      <DependentUpon>ApplicationFileSelectView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\QuestionWindow.xaml.cs">
+      <DependentUpon>QuestionWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Dictionary\Font.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dictionary\NotifyIconResources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\ConfigurationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\ConfigView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ApplicationFileSelectView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\QuestionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -210,6 +238,24 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="Resources\Roboto-Black.ttf" />
+    <None Include="Resources\Roboto-BlackItalic.ttf" />
+    <None Include="Resources\Roboto-Bold.ttf" />
+    <None Include="Resources\Roboto-BoldItalic.ttf" />
+    <None Include="Resources\Roboto-Italic.ttf" />
+    <None Include="Resources\Roboto-Light.ttf" />
+    <None Include="Resources\Roboto-LightItalic.ttf" />
+    <None Include="Resources\Roboto-Medium.ttf" />
+    <None Include="Resources\Roboto-MediumItalic.ttf" />
+    <None Include="Resources\Roboto-Regular.ttf" />
+    <None Include="Resources\Roboto-Thin.ttf" />
+    <None Include="Resources\Roboto-ThinItalic.ttf" />
+    <None Include="Resources\RobotoCondensed-Bold.ttf" />
+    <None Include="Resources\RobotoCondensed-BoldItalic.ttf" />
+    <None Include="Resources\RobotoCondensed-Italic.ttf" />
+    <None Include="Resources\RobotoCondensed-Light.ttf" />
+    <None Include="Resources\RobotoCondensed-LightItalic.ttf" />
+    <None Include="Resources\RobotoCondensed-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

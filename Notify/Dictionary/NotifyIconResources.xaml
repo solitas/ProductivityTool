@@ -2,20 +2,29 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:tb="http://www.hardcodet.net/taskbar"
                     xmlns:viewMode="clr-namespace:ProductivityTool.Notify.ViewModel"
-                    xmlns:model="clr-namespace:ProductivityTool.Notify.Model">
+                    xmlns:model="clr-namespace:ProductivityTool.Notify.Model"
+                    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls">
 
     <ContextMenu x:Shared="false" x:Key="SysTrayMenu" ItemsSource="{Binding Applications}">
         <ContextMenu.ItemContainerStyle>
             <Style TargetType="{x:Type MenuItem}">
                 <Setter Property="Command" Value="{Binding Command}" />
-                <Setter Property="Icon" Value="{Binding Icon}"></Setter>
+                <Setter Property="Icon" Value="{Binding Icon}"/>
             </Style>
         </ContextMenu.ItemContainerStyle>
         <ContextMenu.ItemTemplate>
             <HierarchicalDataTemplate DataType="{x:Type model:MatchedApplication}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding Header}" Margin="5"/>
+                <StackPanel Orientation="Horizontal"  Margin="15">
+                    <mah:Badged x:Name="badge" Badge="{Binding BadgeValue}">
+                        <TextBlock Text="{Binding Header}" FontFamily="{DynamicResource DefaultFont}" FontSize="12"/>
+                    </mah:Badged>
                 </StackPanel>
+                <HierarchicalDataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding BadgeValue}" Value="0">
+                        <Setter TargetName="badge" Property="BadgeBackground" Value="#00FFFFFF"></Setter>
+                        <Setter TargetName="badge" Property="BadgeForeground" Value="#00FFFFFF"></Setter>
+                    </DataTrigger>
+                </HierarchicalDataTemplate.Triggers>
             </HierarchicalDataTemplate>
         </ContextMenu.ItemTemplate>
     </ContextMenu>

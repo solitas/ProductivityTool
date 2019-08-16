@@ -1,5 +1,6 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
 using System.Windows;
+using ProductivityTool.Notify.View;
 
 namespace ProductivityTool.Notify
 {
@@ -16,13 +17,20 @@ namespace ProductivityTool.Notify
             var notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
 
             _bootstrapper = new AppBootstrapper(notifyIcon);
+            var dispatcher = Dispatcher;
 
-            Interactions.QuestionUpdateApplication.RegisterHandler(context =>
+            Interactions.QuestionUpdateApplication.RegisterHandlerForDialog(context =>
             {
                 var message = context.Input;
-                var result = MessageBox.Show(message, "question", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
-                
-                context.SetOutput(result == MessageBoxResult.Yes);
+                dispatcher.Invoke(() =>
+                {
+                    var configView = new QuestionWindow();
+                    configView.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                    var result = configView.ShowDialog();
+                    context.SetOutput(result == true);
+                });
+//                var result = MessageBox.Show(message, "question", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+//                context.SetOutput(result == MessageBoxResult.Yes);
             });
         }
         protected override void OnExit(ExitEventArgs e)

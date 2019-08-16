@@ -11,7 +11,7 @@ namespace ProductivityTool.Notify.Model
             Header = "Configuration";
             Command = ReactiveCommand.Create(() =>
             {
-                var configView = new ConfigView { WindowStartupLocation = WindowStartupLocation.CenterScreen };
+                var configView = new ConfigurationWindow();
                 configView.Show();
             });
         }

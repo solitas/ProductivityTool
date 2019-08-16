@@ -1,20 +1,17 @@
 ﻿using DynamicData;
 using DynamicData.Annotations;
 
-using Microsoft.WindowsAPICodePack.Dialogs;
-
 using ProductivityTool.Notify.Model;
 
 using ReactiveUI;
 
 using System;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace ProductivityTool.Notify.ViewModel
@@ -24,15 +21,11 @@ namespace ProductivityTool.Notify.ViewModel
         private const int MaxCountOfRootPath = 3;
 
         private readonly IComponentUpdater _componentUpdater;
-
-        private string _userInputAppName;
-        private string _userInputRootPath;
-        private string _userSelectAppName;
-        private string _userSelectRootPath;
+        private string _selectedRootPath;
         private ApplicationModel _selectedAppModel;
-
+        private MatchedApplication _selectedMatchedApplication;
         private bool _isUpdating;
-        
+
         public bool IsUpdating
         {
             get => _isUpdating;
@@ -46,8 +39,6 @@ namespace ProductivityTool.Notify.ViewModel
             _componentUpdater = updater;
             Manager = manager;
 
-            
-
             manager.MatchedAppInfos.Connect()
                 .Filter(app => !(app is ConfigurationMenu) && !(app is ExitMenu))
                 .Bind(out var items)
@@ -55,18 +46,9 @@ namespace ProductivityTool.Notify.ViewModel
 
             MatchedItems = items;
 
-            var canAddApp = this.WhenAnyValue(x => x.UserInputAppName)
-                                .Select(x => !string.IsNullOrEmpty(x) && FileNameFormatCheck(x));
-            var canRemoveApp = this.WhenAnyValue(x => x.UserSelectAppName)
-                .Select(x => !string.IsNullOrEmpty(x));
-
-            var canAddRootPath = this.WhenAnyValue(x => x.UserInputRootPath)
-                .Select(x => !string.IsNullOrEmpty(x));
-            var canRemoveRootPath = this.WhenAnyValue(x => x.UserSelectRootPath)
-                .Select(x => !string.IsNullOrEmpty(x));
-
-            var canUpdate = this.WhenAnyValue(x => x.IsUpdating)
-                .Select(x => !x);
+            var canUpdate = this.WhenAnyValue(x => x.IsUpdating).Select(isUpdating => isUpdating == false);
+            var canRemoveApplication = this.WhenAnyValue(x => x.SelectedAppModel).Select(x => x != null && !IsUpdating);
+            var canRemoveRootPath = this.WhenAnyValue(x => x.SelectedRootPath).Select(x => !string.IsNullOrEmpty(x) && !IsUpdating);
 
             UpdateApp = ReactiveCommand.Create(async () =>
             {
@@ -74,86 +56,68 @@ namespace ProductivityTool.Notify.ViewModel
                 await UpdateApplications();
                 IsUpdating = false;
             }, canUpdate);
+            
             ResetAppInfo = ReactiveCommand.Create(ResetApplication, canUpdate);
-            AddApplication = ReactiveCommand.Create(() =>
+            
+            AddApplication = ReactiveCommand.Create(async () =>
             {
-                CreateNewApplicationModel(UserInputAppName);
-                UserInputAppName = string.Empty;
-            }, canAddApp);
+                string applicationName = await Interactions.ApplicationFileSelect.Handle(Unit.Default);
+                CreateNewApplicationModel(applicationName);
+            }, canUpdate);
 
+            
             RemoveApplication = ReactiveCommand.Create(() =>
             {
-                
-            }, canRemoveApp);
-
-            AddRootPath = ReactiveCommand.Create(() =>
-            {
-                if (Manager.RootPaths.All(name => name != UserInputRootPath))
+                if (SelectedAppModel != null)
                 {
-                    Manager.RootPaths.Add(UserInputRootPath);
+                    Manager.ApplicationModels.Remove(SelectedAppModel);
                 }
+            }, canRemoveApplication);
+            
+            AddRootPath = ReactiveCommand.Create(async () =>
+            {
+                string rootPath = await Interactions.RootPathSelect.Handle(Unit.Default);
 
-                UserInputRootPath = string.Empty;
-            }, canAddRootPath);
+                if (Manager.RootPaths.All(name => name != rootPath))
+                {
+                    Manager.RootPaths.Add(rootPath);
+                }
+            }, canUpdate);
 
             RemoveRootPath = ReactiveCommand.Create(() =>
             {
-                if (Manager.RootPaths.Any(name => name == UserSelectRootPath))
+                if (!string.IsNullOrEmpty(SelectedRootPath))
                 {
-                    Manager.RootPaths.Remove(UserSelectRootPath);
+                    Manager.RootPaths.Remove(SelectedRootPath);
                 }
             }, canRemoveRootPath);
 
-            SelectPath = ReactiveCommand.Create(() =>
-            {
-                var dialog = new CommonOpenFileDialog
+            this.WhenAnyValue(x => x.IsUpdating)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(isUpdating =>
                 {
-                    IsFolderPicker = true,
-                    Multiselect = false
-                };
-
-                var result = dialog.ShowDialog();
-                if (result == CommonFileDialogResult.Ok)
-                {
-                    var path = dialog.FileName;
-                    var info = new DirectoryInfo(path);
-
-                    if ((info.Attributes & FileAttributes.Directory) == 0)
+                    if (isUpdating)
                     {
-                        MessageBox.Show("this is not directory");
-                        return;
+                        
                     }
-
-                    UserInputRootPath = dialog.FileName;
-                }
-            });
+                });
         }
 
         public ApplicationManager Manager { get; set; }
-        public string UserInputAppName
+        public string SelectedRootPath
         {
-            get => _userInputAppName;
-            set => this.RaiseAndSetIfChanged(ref _userInputAppName, value);
-        }
-        public string UserInputRootPath
-        {
-            get => _userInputRootPath;
-            set => this.RaiseAndSetIfChanged(ref _userInputRootPath, value);
-        }
-        public string UserSelectAppName
-        {
-            get => _userSelectAppName;
-            set => this.RaiseAndSetIfChanged(ref _userSelectAppName, value);
-        }
-        public string UserSelectRootPath
-        {
-            get => _userSelectRootPath;
-            set => this.RaiseAndSetIfChanged(ref _userSelectRootPath, value);
+            get => _selectedRootPath;
+            set => this.RaiseAndSetIfChanged(ref _selectedRootPath, value);
         }
         public ApplicationModel SelectedAppModel
         {
             get => _selectedAppModel;
             set => this.RaiseAndSetIfChanged(ref _selectedAppModel, value);
+        }
+        public MatchedApplication SelectedMatchedApplication
+        {
+            get => _selectedMatchedApplication;
+            set => this.RaiseAndSetIfChanged(ref _selectedMatchedApplication, value);
         }
         public ICommand UpdateApp { get; set; }
         public ICommand ResetAppInfo { get; set; }
@@ -175,7 +139,6 @@ namespace ProductivityTool.Notify.ViewModel
         {
             Manager.AddNewApplication(fileName);
         }
-
         private void RemoveApplicationModel(Guid appId)
         {
             Manager.RemoveApplication(appId);

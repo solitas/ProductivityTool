@@ -22,33 +22,37 @@ namespace ProductivityTool.Notify.Model
         private Image _icon;
 
         private string _originalFile;
-
+        private int _badgeValue;
         public MatchedApplication()
         {
-            Command = ReactiveCommand.Create(async() =>
+            Command = ReactiveCommand.Create(() =>
             {
-                var newestFile = await ApplicationManager.Instance.UpdateCheck(this);
-
-                if (!string.IsNullOrEmpty(newestFile))
+                if (Update != null && Update.NeedUpdate)
                 {
-                    string message = $"{Header} 에 대한 최신 파일이 존재합니다.\r\n최신 파일로 변경하시겠습니까?";
-                    var questionResult = await Interactions.QuestionUpdateApplication.Handle(message);
-
-                    if (questionResult)
+                    var message = $"{Header} 에 대한 최신 파일이 존재합니다.\r\n최신 파일로 변경하시겠습니까?";
+                    Interactions.QuestionUpdateApplication.Handle(message).Subscribe(questionResult =>
                     {
-                        ApplicationManager.Instance.UpdateMatchedApplication(this, newestFile);
-                    }
+                        if (questionResult)
+                        {
+                            ApplicationManager.Instance.UpdateMatchedApplication(this, Update.OriginalFile);
+                            BadgeValue = 0;
+                            Update = null;
+                            Process.Start(ExecuteFile);
+                        }
+                    });
                 }
-
-                if (!string.IsNullOrEmpty(ExecuteFile))
+                else
                 {
-                    try
+                    if (!string.IsNullOrEmpty(ExecuteFile))
                     {
-                        Process.Start(ExecuteFile);
-                    }
-                    catch
-                    {
+                        try
+                        {
+                            Process.Start(ExecuteFile);
+                        }
+                        catch
+                        {
 
+                        }
                     }
                 }
             });
@@ -121,5 +125,18 @@ namespace ProductivityTool.Notify.Model
                 Source = FileToImageIconConverter.Icon(executeFile)
             };
         }
+
+        public UpdateModel Update { get; set; }
+
+        public int BadgeValue
+        {
+            get => _badgeValue;
+            set => this.RaiseAndSetIfChanged(ref _badgeValue, value);
+        }
+    }
+    public class UpdateModel
+    {
+        public bool NeedUpdate { get; set; }
+        public string OriginalFile { get; set; }
     }
 }

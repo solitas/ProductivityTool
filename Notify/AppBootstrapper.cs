@@ -20,6 +20,7 @@ namespace ProductivityTool.Notify
             Updater = new DirectoryNameUpdater();
 
             FileService.InitializeConfigFile(ApplicationManager.Instance);
+            ApplicationManager.Instance.NotifyIcon = notifyIcon;
             ApplicationManager.Instance.StartUpdateChecker();
         }
 

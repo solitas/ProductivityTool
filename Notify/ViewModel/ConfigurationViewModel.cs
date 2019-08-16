@@ -11,12 +11,13 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace ProductivityTool.Notify.ViewModel
 {
-    public class ConfigurationViewModel : ReactiveObject, IConfigurationViewModel
+    public class ConfigurationViewModel : ReactiveObject, IConfigurationViewModel, IDisposable
     {
         private const int MaxCountOfRootPath = 3;
 
@@ -25,6 +26,7 @@ namespace ProductivityTool.Notify.ViewModel
         private ApplicationModel _selectedAppModel;
         private MatchedApplication _selectedMatchedApplication;
         private bool _isUpdating;
+        private CancellationTokenSource _ctx;
 
         public bool IsUpdating
         {
@@ -49,23 +51,31 @@ namespace ProductivityTool.Notify.ViewModel
             var canUpdate = this.WhenAnyValue(x => x.IsUpdating).Select(isUpdating => isUpdating == false);
             var canRemoveApplication = this.WhenAnyValue(x => x.SelectedAppModel).Select(x => x != null && !IsUpdating);
             var canRemoveRootPath = this.WhenAnyValue(x => x.SelectedRootPath).Select(x => !string.IsNullOrEmpty(x) && !IsUpdating);
+            _ctx = new CancellationTokenSource();
 
             UpdateApp = ReactiveCommand.Create(async () =>
             {
+                ApplicationManager.Instance.StopUpdaterCheck();
+                Console.WriteLine(@"Update App Starting ..");
                 IsUpdating = true;
-                await UpdateApplications();
+                await UpdateApplications(_ctx.Token).ContinueWith(x =>
+                {
+                    
+                });
+                Console.WriteLine(@"Update App Stopped ..");
+                ApplicationManager.Instance.StartUpdateChecker();
                 IsUpdating = false;
             }, canUpdate);
-            
+
             ResetAppInfo = ReactiveCommand.Create(ResetApplication, canUpdate);
-            
+
             AddApplication = ReactiveCommand.Create(async () =>
             {
                 string applicationName = await Interactions.ApplicationFileSelect.Handle(Unit.Default);
                 CreateNewApplicationModel(applicationName);
             }, canUpdate);
 
-            
+
             RemoveApplication = ReactiveCommand.Create(() =>
             {
                 if (SelectedAppModel != null)
@@ -73,7 +83,7 @@ namespace ProductivityTool.Notify.ViewModel
                     Manager.ApplicationModels.Remove(SelectedAppModel);
                 }
             }, canRemoveApplication);
-            
+
             AddRootPath = ReactiveCommand.Create(async () =>
             {
                 string rootPath = await Interactions.RootPathSelect.Handle(Unit.Default);
@@ -98,7 +108,7 @@ namespace ProductivityTool.Notify.ViewModel
                 {
                     if (isUpdating)
                     {
-                        
+
                     }
                 });
         }
@@ -127,9 +137,9 @@ namespace ProductivityTool.Notify.ViewModel
         public ICommand RemoveApplication { get; set; }
         public ICommand SelectPath { get; set; }
 
-        private async Task UpdateApplications()
+        private async Task UpdateApplications(CancellationToken token)
         {
-            await Manager.UpdateApplication(_componentUpdater);
+            await Manager.UpdateApplication(token, _componentUpdater);
         }
         private void ResetApplication()
         {
@@ -166,6 +176,11 @@ namespace ProductivityTool.Notify.ViewModel
         private static bool FileNameFormatCheck(string appName)
         {
             return !Regex.IsMatch(appName, @"^(?!.*\.exe$).*$");
+        }
+
+        public void Dispose()
+        {
+            _ctx?.Dispose();
         }
     }
 }

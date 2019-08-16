@@ -1,0 +1,119 @@
+﻿<UserControl x:Class="ProductivityTool.Notify.View.UpdateApplicationNotify"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ProductivityTool.Notify.View"
+             xmlns:tb="http://www.hardcodet.net/taskbar"
+             mc:Ignorable="d" 
+             x:Name="me"
+             Height="120"
+             Width="240">
+    <UserControl.Resources>
+        <Storyboard x:Key="HighlightCloseButton">
+            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
+                                           Storyboard.TargetName="imgClose"
+                                           Storyboard.TargetProperty="(UIElement.Opacity)">
+                <SplineDoubleKeyFrame KeyTime="00:00:00"
+                                      Value="0.4" />
+                <SplineDoubleKeyFrame KeyTime="00:00:00.3000000"
+                                      Value="1" />
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="FadeCloseButton">
+            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
+                                           Storyboard.TargetName="imgClose"
+                                           Storyboard.TargetProperty="(UIElement.Opacity)">
+                <SplineDoubleKeyFrame KeyTime="00:00:00"
+                                      Value="1" />
+                <SplineDoubleKeyFrame KeyTime="00:00:00.3000000"
+                                      Value="0.4" />
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="FadeIn">
+            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
+                                           Storyboard.TargetName="grid"
+                                           Storyboard.TargetProperty="(UIElement.Opacity)">
+                <SplineDoubleKeyFrame KeyTime="00:00:00"
+                                      Value="0" />
+                <SplineDoubleKeyFrame KeyTime="00:00:01"
+                                      Value="0.95" />
+                <SplineDoubleKeyFrame KeyTime="00:00:03"
+                                      Value="0.95" />
+                <!--				<SplineDoubleKeyFrame KeyTime="00:00:05" Value="0"/>-->
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="FadeBack">
+            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
+                                           Storyboard.TargetName="grid"
+                                           Storyboard.TargetProperty="(UIElement.Opacity)">
+                <SplineDoubleKeyFrame KeyTime="00:00:00"
+                                      Value="1" />
+                <SplineDoubleKeyFrame KeyTime="00:00:00.3000000"
+                                      Value="1" />
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="FadeOut"
+                    Completed="OnFadeOutCompleted">
+            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
+                                           Storyboard.TargetName="grid"
+                                           Storyboard.TargetProperty="(UIElement.Opacity)">
+                <SplineDoubleKeyFrame KeyTime="00:00:00"
+                                      Value="1" />
+                <SplineDoubleKeyFrame KeyTime="00:00:00.3000000"
+                                      Value="0.2" />
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </UserControl.Resources>
+    <UserControl.Triggers>
+        <EventTrigger RoutedEvent="tb:TaskbarIcon.BalloonShowing">
+            <BeginStoryboard Storyboard="{StaticResource FadeIn}"
+                             x:Name="FadeIn_BeginStoryboard" />
+        </EventTrigger>
+        <EventTrigger RoutedEvent="Mouse.MouseEnter"
+                      SourceName="imgClose">
+            <BeginStoryboard Storyboard="{StaticResource HighlightCloseButton}"
+                             x:Name="HighlightCloseButton_BeginStoryboard" />
+        </EventTrigger>
+        <EventTrigger RoutedEvent="Mouse.MouseLeave"
+                      SourceName="imgClose">
+            <BeginStoryboard Storyboard="{StaticResource FadeCloseButton}"
+                             x:Name="FadeCloseButton_BeginStoryboard" />
+        </EventTrigger>
+        <EventTrigger RoutedEvent="Mouse.MouseEnter">
+            <StopStoryboard BeginStoryboardName="FadeIn_BeginStoryboard" />
+            <BeginStoryboard x:Name="FadeBack_BeginStoryboard1"
+                             Storyboard="{StaticResource FadeBack}" />
+        </EventTrigger>
+        <EventTrigger RoutedEvent="tb:TaskbarIcon.BalloonClosing">
+            <BeginStoryboard Storyboard="{StaticResource FadeOut}"
+                             x:Name="FadeOut_BeginStoryboard" />
+        </EventTrigger>
+    </UserControl.Triggers>
+    <Grid x:Name="grid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+        <Border
+                Grid.Row="0" Grid.RowSpan="3"
+                Grid.Column="0" Grid.ColumnSpan="2"
+                Margin="1" Background="#FFEEEEEE">
+            <Border.Effect>
+                <DropShadowEffect Color="#FF747474" />
+            </Border.Effect>
+        </Border>
+        <Image x:Name="imgClose" Margin="0,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="16" Height="16" Grid.Column="1" Source="/Notify;component/Resources/Close.png" Opacity="0.4" Stretch="Fill" Cursor="Hand" PreviewMouseDown="CloseButton_PreviewMouseDown" Grid.RowSpan="2"/>
+        <TextBlock TextWrapping="Wrap"
+                   Text="{Binding NotifyText, ElementName=me, Mode=Default}"
+                   FontFamily="/Notify;component/Resources/#Roboto" FontSize="20" Margin="0" VerticalAlignment="Top" Grid.Row="1" HorizontalAlignment="Center" Grid.ColumnSpan="2" Foreground="#FF3A7ABA" />
+        <Button Content="Update" Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Height="24" FontSize="12" FontFamily="/Notify;component/Resources/#Roboto" Width="58" Background="#FF3A7ABA" Foreground="#FFE7E7F2"/>
+        <TextBlock TextWrapping="Wrap"
+            FontFamily="/Notify;component/Resources/#Roboto" FontSize="8" Margin="0,0,0,3" VerticalAlignment="Bottom" Grid.Row="1" HorizontalAlignment="Center" Grid.ColumnSpan="2" Foreground="#FF686868" Text="Application is updated, Would you wand update?" />
+    </Grid>
+</UserControl>

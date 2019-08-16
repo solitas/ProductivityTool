@@ -9,63 +9,59 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 
 namespace ProductivityTool.Notify
 {
     public static class FileService
     {
         // last write time 기준으로 Search
-        
-        public static async Task<string> SearchAsync(ICollection<string> roots, string searchPattern, IComponentUpdater updater = null)
+
+        public static async Task<string> SearchAsync(ICollection<string> roots, string searchPattern, CancellationToken token, IComponentUpdater updater = null)
         {
-            try
+            return await Task.Factory.StartNew(() => Search(roots, searchPattern, token, updater), token);
+        }
+
+        private static string Search(IEnumerable<string> roots, string searchPattern, CancellationToken token, IComponentUpdater updater = null)
+        {
+            var listFileFound = new List<string>();
+
+            foreach (var root in roots)
             {
-                return await Task.Factory.StartNew(() =>
+                if (token.IsCancellationRequested)
                 {
-                    var listFileFound = new List<string>();
-                    var totalSearchDir = 0;
-                    
-                    foreach (var root in roots)
-                    {
-                        var info = new DirectoryInfo(root);
-                        totalSearchDir += info.EnumerateDirectories().Count();
-                    }
+                    break;
+                }
 
-                    foreach (var root in roots)
-                    {
-                        var rootIsExist = Directory.Exists(root);
-
-                        if (rootIsExist)
-                        {
-                            FileSearch(listFileFound, root, searchPattern, updater);
-                        }
-                    }
-
-
-                    var maxLastWriteTime = DateTime.MinValue;
-                    var lastWriteFile = string.Empty;
-
-                    foreach (var file in listFileFound)
-                    {
-                        FileInfo fileInfo = new FileInfo(file);
-                        if (fileInfo.LastWriteTime > maxLastWriteTime)
-                        {
-                            maxLastWriteTime = fileInfo.LastWriteTime;
-                            lastWriteFile = file;
-                        }
-                    }
-
-                    return lastWriteFile;
-                });
+                var rootIsExist = Directory.Exists(root);
+                if (rootIsExist)
+                {
+                    FileSearch(listFileFound, root, searchPattern, token, updater);
+                }
             }
-            catch
+
+
+            var maxLastWriteTime = DateTime.MinValue;
+            var lastWriteFile = string.Empty;
+
+            foreach (var file in listFileFound)
             {
-
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+                var fileInfo = new FileInfo(file);
+                if (fileInfo.LastWriteTime > maxLastWriteTime)
+                {
+                    maxLastWriteTime = fileInfo.LastWriteTime;
+                    lastWriteFile = file;
+                }
             }
 
-            return string.Empty;
+            return lastWriteFile;
         }
 
         public static void InitializeConfigFile(ApplicationManager manager)
@@ -81,7 +77,7 @@ namespace ProductivityTool.Notify
             LoadConfigurationFile(Resources.ConfigurationFile, manager.RootPaths, manager.ApplicationModels, manager.MatchedAppInfos);
         }
 
-        private static void FileSearch(List<string> fileFound, string dir, string searchPattern, IComponentUpdater updater = null)
+        private static void FileSearch(List<string> fileFound, string dir, string searchPattern, CancellationToken token, IComponentUpdater updater = null)
         {
             try
             {
@@ -89,6 +85,11 @@ namespace ProductivityTool.Notify
 
                 foreach (var directory in directories)
                 {
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
                     updater?.Update(directory);
                     try
                     {
@@ -103,9 +104,9 @@ namespace ProductivityTool.Notify
                     }
                     catch (UnauthorizedAccessException)
                     {
-                        Console.WriteLine(@"2.권한 없는 폴더임 {0}", directory);
+                        Console.WriteLine(@"1.권한 없는 폴더임 {0}", dir);
                     }
-                    FileSearch(fileFound, directory, searchPattern);
+                    FileSearch(fileFound, directory, searchPattern, token, updater);
                 }
                 updater?.Update("");
             }
@@ -120,7 +121,7 @@ namespace ProductivityTool.Notify
             var rootElement = new XElement("Configuration");
             rootElement.Add(MakeCollectionElement("RootPaths", "RootPath", rootPaths));
             rootElement.Add(MakeAppModelElement("AppModels", "AppModel", appNames));
-            rootElement.Add(MakeMatchedAppInfo("AppInfos","AppInfo", infos));
+            rootElement.Add(MakeMatchedAppInfo("AppInfos", "AppInfo", infos));
             try
             {
                 var doc = new XDocument();
@@ -157,7 +158,7 @@ namespace ProductivityTool.Notify
                 if (item is ExitMenu)
                     continue;
 
-                XElement child = new XElement(childName, 
+                XElement child = new XElement(childName,
                     new XElement("AppName", item.ApplicationName),
                     new XElement("OrgFile", item.OriginalFile),
                     new XElement("ExeFile", item.ExecuteFile),
@@ -190,9 +191,9 @@ namespace ProductivityTool.Notify
                 {
                     foreach (var e in appNamesElement.Elements("AppModel"))
                     {
-                        
+
                         Guid id = Guid.Empty;
-                        
+
                         var appId = e.Element("AppId");
                         if (appId != null)
                         {
@@ -200,7 +201,7 @@ namespace ProductivityTool.Notify
                             {
                                 throw new ArgumentException("Id cannot be null");
                             }
-                            
+
                         }
 
                         string fileName = string.Empty;
@@ -252,11 +253,11 @@ namespace ProductivityTool.Notify
                         {
                             matchedAppInfo.Header = header.Value;
                         }
-                        
+
                         infos.Add(matchedAppInfo);
                     }
                 }
-                
+
                 return true;
             }
             catch

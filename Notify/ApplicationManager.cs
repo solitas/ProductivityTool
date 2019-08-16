@@ -7,17 +7,26 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
+using Hardcodet.Wpf.TaskbarNotification;
+using ProductivityTool.Notify.View;
 
 namespace ProductivityTool.Notify
 {
-    public class ApplicationManager : ReactiveObject
+    public class ApplicationManager : ReactiveObject, IDisposable
     {
         private const string RootApplicationDirectory = "Applications\\";
         private static readonly Lazy<ApplicationManager> Lazy = new Lazy<ApplicationManager>(() => new ApplicationManager());
+        
+        private DispatcherTimer _updateCheckTimer;
+        private CancellationTokenSource _updateCheckerStop;
 
         public static ApplicationManager Instance => Lazy.Value;
+        public TaskbarIcon NotifyIcon { get; set; }
 
         private ApplicationManager()
         {
@@ -109,11 +118,11 @@ namespace ProductivityTool.Notify
             MatchedAppInfos.Clear();
         }
 
-        public async Task UpdateApplication(IComponentUpdater updater)
+        public async Task UpdateApplication(CancellationToken token, IComponentUpdater updater)
         {
             foreach (var model in ApplicationModels)
             {
-                await FileService.SearchAsync(RootPaths, model.FileName, updater)
+                await FileService.SearchAsync(RootPaths, model.FileName, token, updater)
                     .ContinueWith(t =>
                     {
                         var file = t.Result;
@@ -123,7 +132,7 @@ namespace ProductivityTool.Notify
                             if (newAppInfo != null)
                                 InsertMatchedApplication(newAppInfo);
                         }
-                    });
+                    }, token);
             }
         }
 
@@ -143,14 +152,16 @@ namespace ProductivityTool.Notify
 
             return null;
         }
+
         /// <summary>
         /// 최신 프로그램이 존재여부를 검사합니다.
         /// </summary>
         /// <param name="app"></param>
+        /// <param name="token"></param>
         /// <returns>최신 프로그램이 존재하면 최신파일경로, 그렇지 않으면 string.Empty</returns>
-        public async Task<string> UpdateCheck(MatchedApplication app)
+        public async Task<string> UpdateCheck(MatchedApplication app, CancellationToken token)
         {
-            return await FileService.SearchAsync(RootPaths, app.ApplicationName)
+            return await FileService.SearchAsync(RootPaths, app.ApplicationName, token)
                 .ContinueWith(t =>
                 {
                     var searchedFile = t.Result;
@@ -161,9 +172,8 @@ namespace ProductivityTool.Notify
                     {
                         return searchedFile;
                     }
-
                     return string.Empty;
-                });
+                }, token);
         }
 
         public void UpdateMatchedApplication(MatchedApplication app, string orgFile)
@@ -181,16 +191,33 @@ namespace ProductivityTool.Notify
 
             }
         }
-        private DispatcherTimer _updateCheckTimer;
+
         public void StartUpdateChecker()
         {
-            _updateCheckTimer = new DispatcherTimer();
-            _updateCheckTimer.Interval = TimeSpan.FromSeconds(10);
-            _updateCheckTimer.Tick += _updateCheckTimer_Tick;
+            Console.WriteLine(@"Update Checker Starting...");
+            _updateCheckerStop = new CancellationTokenSource();
+
+            _updateCheckTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(10) };
+            _updateCheckTimer.Tick += DoUpdateCheck;
             _updateCheckTimer.Start();
         }
 
-        private async void _updateCheckTimer_Tick(object sender, EventArgs e)
+        public void StopUpdaterCheck()
+        {
+            try
+            {
+                _updateCheckTimer.Stop();
+                _updateCheckerStop?.Cancel();
+                _updateCheckerStop?.Dispose();
+                Console.WriteLine(@"Update Checker Stopped...");
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine(@"task cancelled");
+            }
+        }
+
+        private void DoUpdateCheck(object sender, EventArgs e)
         {
             foreach (var app in MatchedAppInfos.Items)
             {
@@ -199,24 +226,53 @@ namespace ProductivityTool.Notify
                     continue;
                 }
 
-                var updateResult = await UpdateCheck(app);
-
-                if (!string.IsNullOrEmpty(updateResult))
-                {
-                    app.Update = new UpdateModel()
+                UpdateCheck(app, _updateCheckerStop.Token)
+                    .ContinueWith(t =>
                     {
-                        NeedUpdate = true,
-                        OriginalFile = updateResult
-                    };
-                    app.BadgeValue = 1;
-                    Console.WriteLine($@"Need update application = {app.ApplicationName}");
-                }
-                else
-                {
-                    app.BadgeValue = 0;
-                    app.Update = null;
-                }
+                        if (_updateCheckerStop.Token.IsCancellationRequested)
+                        {
+                            return;
+                        }
+
+                        var updateResult = t.Result;
+
+                        if (!string.IsNullOrEmpty(updateResult))
+                        {
+                            app.Update = new UpdateModel()
+                            {
+                                NeedUpdate = true,
+                                OriginalFile = updateResult
+                            };
+                            
+                            if (app.BadgeValue == 0)
+                            {
+                               
+                                Application.Current.Dispatcher?.BeginInvoke(new Action(() =>
+                                {
+                                    var balloon = new UpdateApplicationNotify
+                                    {
+                                        NotifyText = $"{app.Header} is updated"
+                                    };
+                                    NotifyIcon.ShowCustomBalloon(balloon, PopupAnimation.Slide, 5000);
+                                }));
+
+                                app.BadgeValue = 1;
+                                Console.WriteLine($@"Need update application = {app.ApplicationName}");
+                            }
+                        }
+                        else
+                        {
+                            app.BadgeValue = 0;
+                            app.Update = null;
+                        }
+                    }, _updateCheckerStop.Token);
             }
+        }
+
+        public void Dispose()
+        {
+            _updateCheckerStop?.Dispose();
+            MatchedAppInfos?.Dispose();
         }
     }
 }

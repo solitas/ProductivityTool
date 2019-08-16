@@ -17,20 +17,15 @@ namespace ProductivityTool.Notify
             var notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
 
             _bootstrapper = new AppBootstrapper(notifyIcon);
-            var dispatcher = Dispatcher;
 
             Interactions.QuestionUpdateApplication.RegisterHandlerForDialog(context =>
             {
-                var message = context.Input;
-                dispatcher.Invoke(() =>
+                var configView = new QuestionWindow
                 {
-                    var configView = new QuestionWindow();
-                    configView.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-                    var result = configView.ShowDialog();
-                    context.SetOutput(result == true);
-                });
-//                var result = MessageBox.Show(message, "question", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
-//                context.SetOutput(result == MessageBoxResult.Yes);
+                    WindowStartupLocation = WindowStartupLocation.CenterScreen
+                };
+                var result = configView.ShowDialog();
+                context.SetOutput(result == true);
             });
         }
         protected override void OnExit(ExitEventArgs e)

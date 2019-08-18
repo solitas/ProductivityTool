@@ -22,7 +22,9 @@ namespace ProductivityTool.Notify.Model
         private Image _icon;
 
         private string _originalFile;
+        
         private int _badgeValue;
+        
         public MatchedApplication()
         {
             Command = ReactiveCommand.Create(() =>

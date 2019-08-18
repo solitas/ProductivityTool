@@ -4,6 +4,7 @@
     <IncludeAssemblies>
       DynamicData
       MahApps.Metro
+      MahApps.Metro.IconPacks
       Pharmacist.Common
       ControlzEx
       Microsoft.WindowsAPICodePack
@@ -12,6 +13,7 @@
       ReactiveUI
       ReactiveUI.Events.WPF
       ReactiveUI.WPF
+      ReactiveUI.Fody.Helpers
       Splat
       System.Reactive
       System.Reactive.Core

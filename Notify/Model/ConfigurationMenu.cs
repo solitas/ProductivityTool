@@ -13,6 +13,9 @@ namespace ProductivityTool.Notify.Model
             {
                 var configView = new ConfigurationWindow();
                 configView.Show();
+
+                var programListWindow = new ProgramListWindow();
+                programListWindow.Show();
             });
         }
     }

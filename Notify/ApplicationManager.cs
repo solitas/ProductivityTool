@@ -34,11 +34,14 @@ namespace ProductivityTool.Notify
 
             MatchedAppInfos = new SourceList<MatchedApplication>();
             ApplicationModels = new ObservableCollection<ApplicationModel>();
+            ExternalPrograms = new SourceCache<IExternalProgram, string>(x => x.Label);
         }
 
         public ObservableCollection<string> RootPaths { get; }
         public ObservableCollection<ApplicationModel> ApplicationModels { get; }
         public SourceList<MatchedApplication> MatchedAppInfos { get; }
+
+        public SourceCache<IExternalProgram, string> ExternalPrograms { get; }
 
         private void CreateDefaultApplicationDirectory()
         {

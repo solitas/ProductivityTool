@@ -10,6 +10,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
 using Hardcodet.Wpf.TaskbarNotification;
@@ -21,7 +22,7 @@ namespace ProductivityTool.Notify
     {
         private const string RootApplicationDirectory = "Applications\\";
         private static readonly Lazy<ApplicationManager> Lazy = new Lazy<ApplicationManager>(() => new ApplicationManager());
-        
+
         private DispatcherTimer _updateCheckTimer;
         private CancellationTokenSource _updateCheckerStop;
 
@@ -34,7 +35,29 @@ namespace ProductivityTool.Notify
 
             MatchedAppInfos = new SourceList<MatchedApplication>();
             ApplicationModels = new ObservableCollection<ApplicationModel>();
+
             ExternalPrograms = new SourceCache<IExternalProgram, string>(x => x.Label);
+
+            ExternalPrograms.Connect()
+                            .OnItemAdded(x =>
+                            {
+                                var executeFile = x.ExecuteDirectory + x.File;
+                                if (File.Exists(executeFile))
+                                {
+                                    try
+                                    {
+                                        x.IconImage = new Image
+                                        {
+                                            Source = FileToImageIconConverter.Icon(executeFile)
+                                        };
+                                    }
+                                    catch
+                                    {
+
+                                    }
+                                }
+                            })
+                            .Subscribe();
         }
 
         public ObservableCollection<string> RootPaths { get; }
@@ -246,10 +269,10 @@ namespace ProductivityTool.Notify
                                 NeedUpdate = true,
                                 OriginalFile = updateResult
                             };
-                            
+
                             if (app.BadgeValue == 0)
                             {
-                               
+
                                 Application.Current.Dispatcher?.BeginInvoke(new Action(() =>
                                 {
                                     var balloon = new UpdateApplicationNotify

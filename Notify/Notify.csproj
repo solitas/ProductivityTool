@@ -182,8 +182,10 @@
     <Compile Include="ViewModel\IConfigurationViewModel.cs" />
     <Compile Include="ViewModel\INotifyIconViewModel.cs" />
     <Compile Include="MatchedApplicationComparer.cs" />
+    <Compile Include="ViewModel\IProgramInsertViewModel.cs" />
     <Compile Include="ViewModel\IProgramListViewModel.cs" />
     <Compile Include="ViewModel\NotifyIconViewModel.cs" />
+    <Compile Include="ViewModel\ProgramInsertViewModel.cs" />
     <Compile Include="ViewModel\ProgramListViewModel.cs" />
     <Compile Include="View\ConfigurationWindow.xaml.cs">
       <DependentUpon>ConfigurationWindow.xaml</DependentUpon>
@@ -198,6 +200,9 @@
     <Compile Include="ImageHelper.cs" />
     <Compile Include="View\ApplicationFileSelectView.xaml.cs">
       <DependentUpon>ApplicationFileSelectView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\InsertProgramView.xaml.cs">
+      <DependentUpon>InsertProgramView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\ProgramListView.xaml.cs">
       <DependentUpon>ProgramListView.xaml</DependentUpon>
@@ -229,6 +234,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\ApplicationFileSelectView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\InsertProgramView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

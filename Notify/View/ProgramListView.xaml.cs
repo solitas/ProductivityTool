@@ -1,4 +1,7 @@
-﻿using ProductivityTool.Notify.ViewModel;
+﻿using System;
+using System.Reactive.Linq;
+using System.Windows.Forms.VisualStyles;
+using ProductivityTool.Notify.ViewModel;
 
 using ReactiveUI;
 
@@ -16,6 +19,8 @@ namespace ProductivityTool.Notify.View
 
             this.WhenActivated(d =>
             {
+                d(this.Bind(ViewModel, viewModel => viewModel.InsertViewModel, view => view.InsertView.ViewModel));
+                d(this.Bind(ViewModel, viewModel => viewModel.IsAddDialogOpen, view => view.DialogHost.IsOpen));
                 d(this.Bind(ViewModel, viewModel => viewModel.SelectedProgram, view => view.Programs.SelectedItem));
                 d(this.OneWayBind(ViewModel, viewModel => viewModel.Programs, view => view.Programs.ItemsSource));
                 d(this.BindCommand(ViewModel, viewModel => viewModel.AddProgram, view => view.AddButton));

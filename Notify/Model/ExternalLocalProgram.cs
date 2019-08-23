@@ -11,7 +11,7 @@ namespace ProductivityTool.Notify.Model
         [Reactive]
         public string Label { get; set; }
         [Reactive]
-        public string Program { get; set; }
+        public string File { get; set; }
         [Reactive]
         public string ExecuteDirectory { get; set; }
         [Reactive]
@@ -36,7 +36,7 @@ namespace ProductivityTool.Notify.Model
         {
             Label = label;
 
-            this.WhenAnyValue(x => x.Program, x => x.ExecuteDirectory)
+            this.WhenAnyValue(x => x.File, x => x.ExecuteDirectory)
                 .Subscribe(x =>
                 {
                     var (program, dir) = x;

@@ -16,7 +16,7 @@ namespace ProductivityTool.Notify.Model
         /// program name, including directory path
         /// ex: c:/application.exe
         /// </summary>
-        string Program { get; set; }
+        string File { get; set; }
 
         /// <summary>
         /// program name, including directory path
@@ -68,7 +68,7 @@ namespace ProductivityTool.Notify.Model
             {
                 ExecuteDirectory = "C:\\Users\\Solit\\project\\myApp\\bin\\netcoreapp3.0\\",
                 PathToSearch = "C:\\Users\\Solit\\project\\myApp\\",
-                Program = "myApp.exe",
+                File = "myApp.exe",
             };
             Programs.Add(executeProgramForLocal);
         }

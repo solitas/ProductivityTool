@@ -11,7 +11,7 @@ namespace ProductivityTool.Notify.Model
         [Reactive]
         public string Label { get; set; }
         [Reactive]
-        public string Program { get; set; }
+        public string File { get; set; }
         [Reactive]
         public string ExecuteDirectory { get; set; }
         [Reactive]
@@ -33,6 +33,16 @@ namespace ProductivityTool.Notify.Model
         public ExternalNetworkProgram(string label)
         {
             Label = label;
+
+            this.WhenAnyValue(x => x.ExecuteDirectory, x => x.File)
+                .Subscribe(x =>
+                {
+                    var (dir, prg) = x;
+                    if (!string.IsNullOrEmpty(prg) && !string.IsNullOrEmpty(dir))
+                    {
+                        // todo Action Execute
+                    }
+                });
         }
 
         [Reactive]

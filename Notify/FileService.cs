@@ -18,13 +18,51 @@ namespace ProductivityTool.Notify
 {
     public static class FileService
     {
+        public static string RootApplicationDirectory = "Applications\\";
         // last write time 기준으로 Search
-
+        public static async Task<string> SearchAsync(string root, string searchPattern, CancellationToken token, IComponentUpdater updater = null)
+        {
+            return await Task.Factory.StartNew(() => Search(root, searchPattern, token, updater), token);
+        }
         public static async Task<string> SearchAsync(ICollection<string> roots, string searchPattern, CancellationToken token, IComponentUpdater updater = null)
         {
             return await Task.Factory.StartNew(() => Search(roots, searchPattern, token, updater), token);
         }
 
+        private static string Search(string root, string searchPattern, CancellationToken token, IComponentUpdater updater = null)
+        {
+            var listFileFound = new List<string>();
+
+            if (token.IsCancellationRequested)
+            {
+                return string.Empty;
+            }
+
+            var rootIsExist = Directory.Exists(root);
+            if (rootIsExist)
+            {
+                FileSearch(listFileFound, root, searchPattern, token, updater);
+            }
+
+            var maxLastWriteTime = DateTime.MinValue;
+            var lastWriteFile = string.Empty;
+
+            foreach (var file in listFileFound)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+                var fileInfo = new FileInfo(file);
+                if (fileInfo.LastWriteTime > maxLastWriteTime)
+                {
+                    maxLastWriteTime = fileInfo.LastWriteTime;
+                    lastWriteFile = file;
+                }
+            }
+
+            return lastWriteFile;
+        }
         private static string Search(IEnumerable<string> roots, string searchPattern, CancellationToken token, IComponentUpdater updater = null)
         {
             var listFileFound = new List<string>();

@@ -34,15 +34,7 @@ namespace ProductivityTool.Notify.View
         public InsertProgramView()
         {
             InitializeComponent();
-
-            this.WhenActivated(d =>
-            {
-                d(this.BindCommand(ViewModel, viewModel => viewModel.InsertProgram, view => view.AcceptButton));
-                d(this.Bind(ViewModel, viewModel => viewModel.ProgramLabel, view => view.InsertProgramLabel.Text));
-                d(this.Bind(ViewModel, viewModel => viewModel.ExecutionProgramFile, view => view.InsertProgramFile.Text));
-                d(this.Bind(ViewModel, viewModel => viewModel.RootDirectory, view => view.RootDirectory.Text));
-                d(this.Bind(ViewModel, viewModel => viewModel.CopyToLocal, view => view.CopyToLocal.IsChecked));
-            });
+            this.WhenAnyValue(x => x.ViewModel).BindTo(this, view => view.DataContext);
         }
 
         private void DirPath_OnClick(object sender, RoutedEventArgs e)
@@ -66,6 +58,7 @@ namespace ProductivityTool.Notify.View
             else
             {
                 RootDirectory.Text = dialog.FileName;
+                ViewModel.RootDirectory = dialog.FileName;
             }
         }
     }

@@ -32,7 +32,14 @@ namespace ProductivityTool.Notify.ViewModel
             get => _selectedProgram;
             set => this.RaiseAndSetIfChanged(ref _selectedProgram, value);
         }
-        public IProgramInsertViewModel InsertViewModel { get; set; }
+
+        private IProgramInsertViewModel _insertViewModel;
+
+        public IProgramInsertViewModel InsertViewModel
+        {
+            get => _insertViewModel;
+            set => this.RaiseAndSetIfChanged(ref _insertViewModel, value);
+        }
         [Reactive]
         public ReadOnlyObservableCollection<IExternalProgram> Programs { get; }
 
@@ -57,10 +64,12 @@ namespace ProductivityTool.Notify.ViewModel
             {
                 InsertViewModel = new ProgramInsertViewModel();
                 InsertViewModel.WhenAnyObservable(x => x.InsertProgram)
-                    .Subscribe(p =>
-                    {
-                        ApplicationManager.Instance.ExternalPrograms.AddOrUpdate(p);
-                    });
+                               .Where(x => x != null)
+                               .Subscribe(p =>
+                               {
+                                   ApplicationManager.Instance.ExternalPrograms.AddOrUpdate(p);
+                                   IsAddDialogOpen = false;
+                               });
 
                 IsAddDialogOpen = true;
 

@@ -1,31 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Forms;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using MaterialDesignThemes.Wpf;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using ProductivityTool.Notify.ViewModel;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
+
 using ReactiveUI;
+using System;
+using System.IO;
+using System.Windows;
+using DynamicData;
 using MessageBox = System.Windows.MessageBox;
 
 namespace ProductivityTool.Notify.View
 {
-    public abstract class InsertProgramViewBase : ReactiveUserControl<IProgramInsertViewModel>
-    {
-
-    }
     /// <summary>
     /// InsertProgramView.xaml에 대한 상호 작용 논리
     /// </summary>
@@ -42,6 +25,14 @@ namespace ProductivityTool.Notify.View
                 d(this.Bind(ViewModel, viewModel => viewModel.ExecutionProgramFile, view => view.InsertProgramFile.Text));
                 d(this.Bind(ViewModel, viewModel => viewModel.RootDirectory, view => view.RootDirectory.Text));
                 d(this.Bind(ViewModel, viewModel => viewModel.CopyToLocal, view => view.CopyToLocal.IsChecked));
+
+                ViewModel.WhenAnyObservable(x => x.InsertProgram)
+                    .Subscribe(p =>
+                    {
+                        if (p != null)
+                            ApplicationManager.Instance.ExternalPrograms.AddOrUpdate(p);
+                        DialogResult = true;
+                    });
             });
         }
 

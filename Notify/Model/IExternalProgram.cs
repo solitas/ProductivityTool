@@ -2,15 +2,16 @@
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+using ProductivityTool.Notify.ViewModel;
 
 namespace ProductivityTool.Notify.Model
 {
-    public interface IExternalProgram
+    public interface IExternalProgram : INotifyMenu
     {
         /// <summary>
         /// label for executable program
         /// </summary>
-        string Label { get; set; }
+        new string Label { get; set; }
 
         /// <summary>
         /// program name, including directory path
@@ -44,12 +45,12 @@ namespace ProductivityTool.Notify.Model
         /// <summary>
         /// Icon Image
         /// </summary>
-        Image IconImage { get; set; }
+        new Image IconImage { get; set; }
 
         /// <summary>
         /// run program command
         /// </summary>
-        ICommand Execute { get; set; }
+        new ICommand Execute { get; set; }
 
         void NeedUpdate();
         void CheckUpdate();

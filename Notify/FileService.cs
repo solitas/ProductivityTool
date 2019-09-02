@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -111,6 +112,17 @@ namespace ProductivityTool.Notify
                 doc.Add(rootElement);
                 doc.Save(Resources.ConfigurationFile);
             }
+            if (!File.Exists(Resources.ProgramsFile))
+            {
+                XDocument doc = new XDocument();
+                var rootElement = new XElement("Programs");
+                doc.Add(rootElement);
+                doc.Save(Resources.ProgramsFile);
+            }
+
+            var programs = new List<IExternalProgram>();
+            LoadProgramInfoFile(Resources.ProgramsFile, programs);
+            manager.InitializeProgram(programs);
 
             LoadConfigurationFile(Resources.ConfigurationFile, manager.RootPaths, manager.ApplicationModels, manager.MatchedAppInfos);
         }
@@ -349,6 +361,130 @@ namespace ProductivityTool.Notify
                     DirectoryCopy(subdir.FullName, temppath, copySubDirs);
                 }
             }
+        }
+
+        public static bool SaveProgramInfoFile(string filePath, ICollection<IExternalProgram> programs)
+        {
+            var root = new XElement("Programs");
+            foreach (var program in programs)
+            {
+                var e = ParseExternalProgramToElement(program);
+                root.Add(e);
+            }
+
+            try
+            {
+                var doc = new XDocument();
+                doc.Add(root);
+                doc.Save(filePath);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool LoadProgramInfoFile(string filePath, ICollection<IExternalProgram> programs)
+        {
+            try
+            {
+                var doc = XDocument.Load(filePath);
+                if (doc.Root == null) return false;
+
+                var rootElement = doc.Root;
+                if (rootElement != null)
+                {
+                    var elements = rootElement.Elements("Program");
+                    foreach (var e in elements)
+                    {
+                        var program = ParseElementToExternalProgram(e);
+                        programs.Add(program);
+                    }
+
+                    return true;
+                }
+
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public static XElement ParseExternalProgramToElement(IExternalProgram program)
+        {
+            XElement element = new XElement("Program");
+            var type = program.GetType().ToString();
+            element.Add(new XElement("Type", type));
+            element.Add(new XElement("Label", program.Label));
+            element.Add(new XElement("File", program.File));
+            element.Add(new XElement("ExecuteDirectory", program.ExecuteDirectory));
+            element.Add(new XElement("PathToSearch", program.PathToSearch));
+            element.Add(new XElement("NumOfRuns", program.NumOfRuns));
+            return element;
+        }
+
+        public static IExternalProgram ParseElementToExternalProgram(XElement element)
+        {
+            IExternalProgram program = null;
+
+            var e = element.Element("Type");
+            if (e != null)
+            {
+                var value = e.Value;
+                try
+                {
+                    Type type = Type.GetType(value);
+
+                    program = CreateProgram(type);
+
+                }
+                catch
+                {
+                    return null;
+                }
+
+            }
+
+            if (program != null)
+            {
+                e = element.Element("Label");
+                if (e != null)
+                {
+                    program.Label = e.Value;
+                }
+
+                e = element.Element("File");
+                if (e != null)
+                {
+                    program.File = e.Value;
+                }
+                e = element.Element("ExecuteDirectory");
+                if (e != null)
+                {
+                    program.ExecuteDirectory = e.Value;
+                }
+                e = element.Element("PathToSearch");
+                if (e != null)
+                {
+                    program.PathToSearch = e.Value;
+                }
+                e = element.Element("NumOfRuns");
+                if (e != null)
+                {
+                    program.NumOfRuns = int.Parse(e.Value);
+                }
+            }
+
+            return program;
+        }
+
+        private static IExternalProgram CreateProgram(Type type)
+        {
+            if (type == typeof(ExternalNetworkProgram)) return new ExternalNetworkProgram();
+            if (type == typeof(ExternalLocalProgram)) return new ExternalLocalProgram();
+            return null;
         }
     }
 }

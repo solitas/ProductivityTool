@@ -56,13 +56,8 @@ namespace ProductivityTool.Notify.ViewModel
             AddProgram = ReactiveCommand.Create<IExternalProgram, Unit>(program =>
             {
                 InsertViewModel = new ProgramInsertViewModel();
-                InsertViewModel.WhenAnyObservable(x => x.InsertProgram)
-                    .Subscribe(p =>
-                    {
-                        ApplicationManager.Instance.ExternalPrograms.AddOrUpdate(p);
-                    });
 
-                IsAddDialogOpen = true;
+                Interactions.InsertProgramDialog.Handle(InsertViewModel).Subscribe();
 
                 return Unit.Default;
             });

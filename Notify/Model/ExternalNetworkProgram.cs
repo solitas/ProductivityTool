@@ -26,6 +26,12 @@ namespace ProductivityTool.Notify.Model
         public bool IsSelected { get; set; }
 
         public ICommand Execute { get; set; }
+        private int _badgeValue;
+        public int BadgeValue
+        {
+            get => _badgeValue;
+            set => this.RaiseAndSetIfChanged(ref _badgeValue, value);
+        }
         public ExternalNetworkProgram()
         {
 

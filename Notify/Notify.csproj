@@ -167,6 +167,7 @@
     <Compile Include="AppBootstrapper.cs" />
     <Compile Include="ApplicationManager.cs" />
     <Compile Include="Interactions.cs" />
+    <Compile Include="MenuComparer.cs" />
     <Compile Include="Model\ApplicationModel.cs" />
     <Compile Include="Model\ConfigurationMenu.cs" />
     <Compile Include="Model\ExitMenu.cs" />
@@ -175,13 +176,16 @@
     <Compile Include="Model\IExternalProgram.cs" />
     <Compile Include="Model\IMenuItem.cs" />
     <Compile Include="Model\MatchedApplication.cs" />
+    <Compile Include="ViewModel\ConfigMenu.cs" />
     <Compile Include="ViewModel\ConfigurationViewModel.cs" />
     <Compile Include="DirectoryNameUpdater.cs" />
     <Compile Include="FileService.cs" />
     <Compile Include="IComponentUpdater.cs" />
+    <Compile Include="ViewModel\ExitM.cs" />
     <Compile Include="ViewModel\IConfigurationViewModel.cs" />
     <Compile Include="ViewModel\INotifyIconViewModel.cs" />
     <Compile Include="MatchedApplicationComparer.cs" />
+    <Compile Include="ViewModel\INotifyMenu.cs" />
     <Compile Include="ViewModel\IProgramInsertViewModel.cs" />
     <Compile Include="ViewModel\IProgramListViewModel.cs" />
     <Compile Include="ViewModel\NotifyIconViewModel.cs" />

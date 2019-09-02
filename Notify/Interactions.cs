@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Reactive;
 using System.Reactive.Linq;
+using ProductivityTool.Notify.Model;
+using ProductivityTool.Notify.ViewModel;
 using ReactiveUI;
 
 namespace ProductivityTool.Notify
@@ -20,5 +22,7 @@ namespace ProductivityTool.Notify
                 },
                 RxApp.MainThreadScheduler));
         }
+
+        public static Interaction<IProgramInsertViewModel, bool> InsertProgramDialog = new Interaction<IProgramInsertViewModel, bool>(RxApp.MainThreadScheduler);
     }
 }

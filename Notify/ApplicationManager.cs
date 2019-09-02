@@ -3,6 +3,8 @@ using ProductivityTool.Notify.Model;
 using ProductivityTool.Notify.ViewModel;
 using ReactiveUI;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -35,13 +37,15 @@ namespace ProductivityTool.Notify
 
             MatchedAppInfos = new SourceList<MatchedApplication>();
             ApplicationModels = new ObservableCollection<ApplicationModel>();
+            Menus = new SourceCache<INotifyMenu, string>(x => x.Label);
+            Menus.AddOrUpdate(new ConfigMenu());
+            Menus.AddOrUpdate(new ExitM());
 
             ExternalPrograms = new SourceCache<IExternalProgram, string>(x => x.Label);
-
             ExternalPrograms.Connect()
                             .OnItemAdded(x =>
                             {
-                                var executeFile = x.ExecuteDirectory + x.File;
+                                var executeFile = x.ExecuteDirectory + "\\" + x.File;
                                 if (File.Exists(executeFile))
                                 {
                                     try
@@ -50,6 +54,7 @@ namespace ProductivityTool.Notify
                                         {
                                             Source = FileToImageIconConverter.Icon(executeFile)
                                         };
+                                        Menus.AddOrUpdate(x);
                                     }
                                     catch
                                     {
@@ -57,7 +62,17 @@ namespace ProductivityTool.Notify
                                     }
                                 }
                             })
+                            .OnItemRemoved(x =>
+                            {
+                                Menus.Remove(x);
+                            })
                             .Subscribe();
+        }
+
+        public void InitializeProgram(ICollection<IExternalProgram> programs)
+        {
+            ExternalPrograms.Clear();
+            ExternalPrograms.AddOrUpdate(programs);
         }
 
         public ObservableCollection<string> RootPaths { get; }
@@ -65,7 +80,7 @@ namespace ProductivityTool.Notify
         public SourceList<MatchedApplication> MatchedAppInfos { get; }
 
         public SourceCache<IExternalProgram, string> ExternalPrograms { get; }
-
+        public SourceCache<INotifyMenu, string> Menus { get; }
         private void CreateDefaultApplicationDirectory()
         {
             try

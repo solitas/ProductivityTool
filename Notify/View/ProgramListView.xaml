@@ -14,57 +14,51 @@
         <SolidColorBrush x:Key="TitleTextBrush" Color="#FF1D1D1D"/>
         <SolidColorBrush x:Key="TextSubtitleBrush" Color="#FF575151"/>
     </UserControl.Resources>
-    <materialDesignMahApps:DialogHost x:Name="DialogHost">
-        <materialDesignMahApps:DialogHost.DialogContent>
-            <local:InsertProgramView x:Name="InsertView"/>
-        </materialDesignMahApps:DialogHost.DialogContent>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Applications" FontFamily="/Notify;component/Resources/#Roboto Medium" FontSize="20" Margin="8,0,0,5" VerticalAlignment="Bottom" Foreground="{DynamicResource TitleTextBrush}"/>
-            <StackPanel HorizontalAlignment="Right" Margin="0,0,5,0" VerticalAlignment="Center" Orientation="Horizontal">
-                <Button x:Name="AddButton" Margin="0" Style="{StaticResource MaterialDesignIconButton}" Foreground="#FF3F3F40"
-                        Command="{x:Static materialDesignMahApps:DialogHost.OpenDialogCommand}">
-                    <materialDesignMahApps:PackIcon Kind="Plus"/>
-                </Button>
-                <Button x:Name="RemoveButton" Margin="0" Style="{StaticResource MaterialDesignIconButton}" Foreground="#FF3F3F40">
-                    <materialDesignMahApps:PackIcon Kind="Minus" />
-                </Button>
-                <Button x:Name="ModifyButton" Margin="0" Style="{StaticResource MaterialDesignIconButton}" Foreground="#FF3F3F40">
-                    <materialDesignMahApps:PackIcon Kind="SettingsHelper"/>
-                </Button>
-            </StackPanel>
-            <ListView x:Name="Programs" Margin="0" Grid.Row="1" ItemTemplate="{DynamicResource ProgramItemTemplate}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center">
-                <ListView.Resources>
-                    <DataTemplate x:Key="ProgramItemTemplate">
-                        <Border x:Name="Border" Padding="0" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource MaterialDesignDivider}" Margin="0,0">
-                            <Grid Height="Auto" Width="Auto">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="36"/>
-                                    <ColumnDefinition Width="55*"/>
-                                    <ColumnDefinition Width="652*"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock x:Name="textBlock" TextWrapping="Wrap" FontFamily="/Notify;component/Resources/#Roboto Medium" FontSize="14" Margin="3" VerticalAlignment="Top" Grid.RowSpan="1" Grid.ColumnSpan="2" Grid.Column="1"><Run Text="{Binding Label}"/></TextBlock>
-                                <TextBlock HorizontalAlignment="Stretch" Margin="3" TextWrapping="Wrap" Text="{Binding ExecuteDirectory}" Grid.Row="1" FontSize="12" Foreground="{DynamicResource TextSubtitleBrush}" FontFamily="/Notify;component/Resources/#Roboto" Grid.Column="1" VerticalAlignment="Top" Grid.ColumnSpan="2" d:LayoutOverrides="Width"/>
-                                <Image Grid.ColumnSpan="1" Margin="3" Grid.RowSpan="2" Source="{Binding IconImage.Source}"/>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                    <col:ArrayList x:Key="Programs">
-                        <model:ExternalLocalProgram Label="myApp01" ExecuteDirectory="c:/user/solit/workspace/myApp/" File="myApp01.exe"/>
-                        <model:ExternalLocalProgram Label="myApp02" ExecuteDirectory="c:/user/solit/workspace/myApp/" File="myApp02.exe"/>
-                    </col:ArrayList>
-                </ListView.Resources>
-                <!-- <ListView.ItemsSource> -->
-                <!--     <Binding Mode="OneWay" Source="{StaticResource Programs}"/> -->
-                <!-- </ListView.ItemsSource> -->
-            </ListView>
-        </Grid>
-    </materialDesignMahApps:DialogHost>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Applications" FontFamily="/Notify;component/Resources/#Roboto Medium" FontSize="20" Margin="8,0,0,5" VerticalAlignment="Bottom" Foreground="{DynamicResource TitleTextBrush}"/>
+        <StackPanel HorizontalAlignment="Right" Margin="0,0,5,0" VerticalAlignment="Center" Orientation="Horizontal">
+            <Button x:Name="AddButton" Margin="0" Style="{StaticResource MaterialDesignIconButton}" Foreground="#FF3F3F40" Command="{x:Static materialDesignMahApps:DialogHost.OpenDialogCommand}">
+                <materialDesignMahApps:PackIcon Kind="Plus"/>
+            </Button>
+            <Button x:Name="RemoveButton" Margin="0" Style="{StaticResource MaterialDesignIconButton}" Foreground="#FF3F3F40">
+                <materialDesignMahApps:PackIcon Kind="Minus" />
+            </Button>
+            <Button x:Name="ModifyButton" Margin="0" Style="{StaticResource MaterialDesignIconButton}" Foreground="#FF3F3F40">
+                <materialDesignMahApps:PackIcon Kind="SettingsHelper"/>
+            </Button>
+        </StackPanel>
+        <ListView x:Name="Programs" Margin="0" Grid.Row="1" ItemTemplate="{DynamicResource ProgramItemTemplate}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center">
+            <ListView.Resources>
+                <DataTemplate x:Key="ProgramItemTemplate">
+                    <Border x:Name="Border" Padding="0" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource MaterialDesignDivider}" Margin="0,0">
+                        <Grid Height="Auto" Width="Auto">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="36"/>
+                                <ColumnDefinition Width="55*"/>
+                                <ColumnDefinition Width="652*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock x:Name="textBlock" TextWrapping="Wrap" FontFamily="/Notify;component/Resources/#Roboto Medium" FontSize="14" Margin="3" VerticalAlignment="Top" Grid.RowSpan="1" Grid.ColumnSpan="2" Grid.Column="1"><Run Text="{Binding Label}"/></TextBlock>
+                            <TextBlock HorizontalAlignment="Stretch" Margin="3" TextWrapping="Wrap" Text="{Binding ExecuteDirectory}" Grid.Row="1" FontSize="12" Foreground="{DynamicResource TextSubtitleBrush}" FontFamily="/Notify;component/Resources/#Roboto" Grid.Column="1" VerticalAlignment="Top" Grid.ColumnSpan="2" d:LayoutOverrides="Width"/>
+                            <Image Grid.ColumnSpan="1" Margin="3" Grid.RowSpan="2" Source="{Binding IconImage.Source}"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+                <col:ArrayList x:Key="Programs">
+                    <model:ExternalLocalProgram Label="myApp01" ExecuteDirectory="c:/user/solit/workspace/myApp/" File="myApp01.exe"/>
+                    <model:ExternalLocalProgram Label="myApp02" ExecuteDirectory="c:/user/solit/workspace/myApp/" File="myApp02.exe"/>
+                </col:ArrayList>
+            </ListView.Resources>
+            <!-- <ListView.ItemsSource> -->
+            <!--     <Binding Mode="OneWay" Source="{StaticResource Programs}"/> -->
+            <!-- </ListView.ItemsSource> -->
+        </ListView>
+    </Grid>
 </local:ProgramListViewBase>

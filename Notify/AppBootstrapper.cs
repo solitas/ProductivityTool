@@ -1,4 +1,5 @@
-﻿using Hardcodet.Wpf.TaskbarNotification;
+﻿using System.Linq;
+using Hardcodet.Wpf.TaskbarNotification;
 
 using ProductivityTool.Notify.Model;
 using ProductivityTool.Notify.Properties;
@@ -34,6 +35,8 @@ namespace ProductivityTool.Notify
                 ApplicationManager.Instance.RootPaths,
                 ApplicationManager.Instance.ApplicationModels,
                 ApplicationManager.Instance.MatchedAppInfos);
+
+            FileService.SaveProgramInfoFile(Resources.ProgramsFile, ApplicationManager.Instance.ExternalPrograms.Items.ToList());
         }
     }
 }

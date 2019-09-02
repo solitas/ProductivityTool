@@ -1,9 +1,7 @@
-﻿using System;
-using System.Reactive.Linq;
-using System.Windows.Forms.VisualStyles;
-using ProductivityTool.Notify.ViewModel;
-
+﻿using ProductivityTool.Notify.ViewModel;
 using ReactiveUI;
+using System;
+using System.Reactive.Linq;
 
 namespace ProductivityTool.Notify.View
 {

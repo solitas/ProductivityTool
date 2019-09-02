@@ -1,14 +1,14 @@
-﻿using System;
+﻿using ProductivityTool.Notify.Model;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+using System;
 using System.IO;
 using System.Reactive;
 using System.Threading;
-using ProductivityTool.Notify.Model;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 namespace ProductivityTool.Notify.ViewModel
 {
-    public class ProgramInsertViewModel : IProgramInsertViewModel
+    public class ProgramInsertViewModel : ReactiveObject, IProgramInsertViewModel
     {
         [Reactive]
         public bool CopyToLocal { get; set; }
@@ -29,7 +29,12 @@ namespace ProductivityTool.Notify.ViewModel
             InsertProgram = ReactiveCommand.CreateFromTask<Unit, IExternalProgram>(async (_) =>
             {
                 IExternalProgram program = null;
-
+                Console.WriteLine("========== insert program ==========");
+                Console.WriteLine($"Program Label = {ProgramLabel}");
+                Console.WriteLine($"Program File = {ExecutionProgramFile}");
+                Console.WriteLine($"Program RootFolder = {RootDirectory}");
+                Console.WriteLine($"Copy to local = {CopyToLocal}");
+                Console.WriteLine("====================================");
                 // 1. Check exists file
                 CancellationTokenSource cts = new CancellationTokenSource();
                 Console.WriteLine(@"add program start");

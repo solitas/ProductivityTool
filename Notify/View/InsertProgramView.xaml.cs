@@ -57,6 +57,7 @@ namespace ProductivityTool.Notify.View
             else
             {
                 RootDirectory.Text = dialog.FileName;
+                ViewModel.RootDirectory = dialog.FileName;
             }
         }
     }

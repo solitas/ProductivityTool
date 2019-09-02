@@ -13,11 +13,11 @@
         <TextBlock>
                     Add a new program
         </TextBlock>
-        <TextBox x:Name="InsertProgramLabel"  Margin="0,8"/>
+        <TextBox x:Name="InsertProgramLabel" Text="{Binding ProgramLabel}" Margin="0,8"/>
         <TextBlock>
                     File
         </TextBlock>
-        <TextBox x:Name="InsertProgramFile"  Margin="0,8"/>
+        <TextBox x:Name="InsertProgramFile" Text="{Binding ExecutionProgramFile}"  Margin="0,8"/>
         <TextBlock>
                     Set Root Directory
         </TextBlock>
@@ -26,15 +26,16 @@
                 <ColumnDefinition/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="RootDirectory" HorizontalAlignment="Stretch" Margin="3,0"/>
+            <TextBox x:Name="RootDirectory" HorizontalAlignment="Stretch" Margin="3,0" Text="{Binding RootDirectory, Mode=TwoWay}"/>
             <Button x:Name="DirPath" Content="..." Height="Auto" Margin="3,0" Grid.Column="1"
                     Click="DirPath_OnClick"/>
         </Grid>
-        <CheckBox x:Name="CopyToLocal" Content="Copy to local" Margin="0,0,0,8" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <CheckBox x:Name="CopyToLocal" Content="Copy to local" Margin="0,0,0,8" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding CopyToLocal}"/>
         <StackPanel Orientation="Horizontal">
             <Button x:Name="AcceptButton"
                     Style="{StaticResource MaterialDesignFlatButton}"
                     IsDefault="True"
+                    Command="{Binding InsertProgram}"
                     Margin="0 8 8 0">
                 ACCEPT
             </Button>

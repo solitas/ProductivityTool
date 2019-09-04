@@ -52,7 +52,7 @@ namespace ProductivityTool.Notify.Model
         /// </summary>
         new ICommand Execute { get; set; }
 
-        void NeedUpdate();
+        void NeedUpdate(bool update, string orgFile = null);
         void CheckUpdate();
         void CheckValidity();
     }

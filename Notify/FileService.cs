@@ -23,6 +23,10 @@ namespace ProductivityTool.Notify
         // last write time 기준으로 Search
         public static async Task<string> SearchAsync(string root, string searchPattern, CancellationToken token, IComponentUpdater updater = null)
         {
+            if (string.IsNullOrEmpty(root) || string.IsNullOrEmpty(searchPattern))
+            {
+                return null;
+            }
             return await Task.Factory.StartNew(() => Search(root, searchPattern, token, updater), token);
         }
         public static async Task<string> SearchAsync(ICollection<string> roots, string searchPattern, CancellationToken token, IComponentUpdater updater = null)

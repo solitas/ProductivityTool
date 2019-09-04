@@ -45,14 +45,13 @@ namespace ProductivityTool.Notify
             ExternalPrograms.Connect()
                             .OnItemAdded(x =>
                             {
-                                var executeFile = x.ExecuteDirectory + "\\" + x.File;
-                                if (File.Exists(executeFile))
+                                if (File.Exists(x.File))
                                 {
                                     try
                                     {
                                         x.IconImage = new Image
                                         {
-                                            Source = FileToImageIconConverter.Icon(executeFile)
+                                            Source = FileToImageIconConverter.Icon(x.File)
                                         };
                                         Menus.AddOrUpdate(x);
                                     }
@@ -216,6 +215,29 @@ namespace ProductivityTool.Notify
                     return string.Empty;
                 }, token);
         }
+        public async Task<string> UpdateCheck(IExternalProgram app, CancellationToken token)
+        {
+            string searchPattern = Path.GetFileName(app.File);
+
+            return await FileService.SearchAsync(app.PathToSearch, searchPattern, token)
+                .ContinueWith(t =>
+                {
+                    if (string.IsNullOrEmpty(t.Result))
+                    {
+                        return string.Empty;
+                    }
+
+                    var searchedFile = t.Result;
+                    var appFileInfo = new FileInfo(app.File);
+                    var searchedFileInfo = new FileInfo(searchedFile);
+
+                    if (appFileInfo.LastWriteTime < searchedFileInfo.LastWriteTime)
+                    {
+                        return searchedFile;
+                    }
+                    return string.Empty;
+                }, token);
+        }
 
         public void UpdateMatchedApplication(MatchedApplication app, string orgFile)
         {
@@ -232,14 +254,25 @@ namespace ProductivityTool.Notify
 
             }
         }
+        public void UpdateMatchedApplication(IExternalProgram program, string orgFile)
+        {
+            try
+            {
+                var fileInfo = new FileInfo(orgFile);
+                FileService.DirectoryCopy(fileInfo.DirectoryName, program.ExecuteDirectory, true);
+            }
+            catch
+            {
 
+            }
+        }
         public void StartUpdateChecker()
         {
             Console.WriteLine(@"Update Checker Starting...");
             _updateCheckerStop = new CancellationTokenSource();
 
             _updateCheckTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(10) };
-            _updateCheckTimer.Tick += DoUpdateCheck;
+            _updateCheckTimer.Tick += UpdateCheckHandler;
             _updateCheckTimer.Start();
         }
 
@@ -305,6 +338,59 @@ namespace ProductivityTool.Notify
                         {
                             app.BadgeValue = 0;
                             app.Update = null;
+                        }
+                    }, _updateCheckerStop.Token);
+            }
+        }
+
+        private void UpdateCheckHandler(object sender, EventArgs e)
+        {
+            foreach (var program in ExternalPrograms.Items)
+            {
+                if (program is ExternalLocalProgram)
+                {
+                    continue;
+                }
+
+                UpdateCheck(program, _updateCheckerStop.Token)
+                    .ContinueWith(t =>
+                    {
+                        if (_updateCheckerStop.Token.IsCancellationRequested)
+                        {
+                            return;
+                        }
+
+                        var updateResult = t.Result;
+
+                        if (!string.IsNullOrEmpty(updateResult))
+                        {
+                            program.NeedUpdate(true, updateResult);
+                            if (program.BadgeValue == 0)
+                            {
+
+                                Application.Current.Dispatcher?.BeginInvoke(new Action(() =>
+                                {
+                                    Action updateAction = () =>
+                                    {
+                                        UpdateMatchedApplication(program, updateResult);
+                                        program.NeedUpdate(false);
+                                    };
+                                    var balloon = new UpdateApplicationNotify
+                                    {
+                                        NotifyText = $"{program.Label} is updated",
+                                        UpdateAction = updateAction
+                                    };
+                                    NotifyIcon.ShowCustomBalloon(balloon, PopupAnimation.Slide, 5000);
+                                }));
+
+                                program.BadgeValue = 1;
+                                Console.WriteLine($@"Need update application = {program.Label}");
+                            }
+                        }
+                        else
+                        {
+                            program.BadgeValue = 0;
+                            //program.Update = null;
                         }
                     }, _updateCheckerStop.Token);
             }

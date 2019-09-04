@@ -39,13 +39,15 @@ namespace ProductivityTool.Notify.ViewModel
                 CancellationTokenSource cts = new CancellationTokenSource();
                 Console.WriteLine(@"add program start");
                 
-                var file = await FileService.SearchAsync(RootDirectory, ExecutionProgramFile, cts.Token);
+                var targetFile = await FileService.SearchAsync(RootDirectory, ExecutionProgramFile, cts.Token);
 
                 Console.WriteLine(@"file search complete");
                 
-                if (!string.IsNullOrEmpty(file))
+                if (!string.IsNullOrEmpty(targetFile))
                 {
-                    var info = new FileInfo(file);
+                    var info = new FileInfo(targetFile);
+
+                    string filePath;
 
                     if (CopyToLocal)
                     {
@@ -55,7 +57,8 @@ namespace ProductivityTool.Notify.ViewModel
                             $"{Environment.CurrentDirectory}\\{FileService.RootApplicationDirectory}{dirName}\\";
 
                         FileService.DirectoryCopy(info.DirectoryName, applicationDir, true);
-
+                        filePath = $"{applicationDir}\\{ExecutionProgramFile}";
+                        
                         program = new ExternalNetworkProgram(ProgramLabel)
                         {
                             ExecuteDirectory = applicationDir,
@@ -63,8 +66,8 @@ namespace ProductivityTool.Notify.ViewModel
                     }
                     else
                     {
-                        FileInfo f = new FileInfo(file);
-                        
+                        var f = new FileInfo(targetFile);
+                        filePath = targetFile;
                         program = new ExternalLocalProgram(ProgramLabel)
                         {
                             ExecuteDirectory = f.DirectoryName
@@ -72,7 +75,7 @@ namespace ProductivityTool.Notify.ViewModel
                     }
 
                     program.PathToSearch = RootDirectory;
-                    program.File = ExecutionProgramFile;
+                    program.File = filePath;
                 }
                 return program;
             });

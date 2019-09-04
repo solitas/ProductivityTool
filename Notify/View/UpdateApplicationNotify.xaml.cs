@@ -48,6 +48,7 @@ namespace ProductivityTool.Notify.View
 
         #endregion
 
+        public Action UpdateAction { get; set; }
         public UpdateApplicationNotify()
         {
             InitializeComponent();
@@ -89,8 +90,6 @@ namespace ProductivityTool.Notify.View
             TaskbarIcon taskbarIcon = TaskbarIcon.GetParentTaskbarIcon(this);
             taskbarIcon.ResetBalloonCloseTimer();
         }
-        
-
         private void CloseButton_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             //the tray icon assigned this attached property to simplify access
@@ -101,6 +100,14 @@ namespace ProductivityTool.Notify.View
         {
             Popup pp = (Popup)Parent;
             pp.IsOpen = false;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateAction?.Invoke();
+
+            var taskbarIcon = TaskbarIcon.GetParentTaskbarIcon(this);
+            taskbarIcon.CloseBalloon();
         }
     }
 }

@@ -19,11 +19,19 @@ namespace ProductivityTool.Notify.View
     /// </summary>
     public partial class QuestionWindow
     {
+        private string _appName;
         public QuestionWindow()
         {
             InitializeComponent();
         }
 
+        public QuestionWindow(string appName)
+        {
+            _appName = appName;
+
+            InitializeComponent();
+            AppNameBlock.Text = _appName;
+        }
         private void YesButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;

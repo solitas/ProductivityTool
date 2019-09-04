@@ -112,8 +112,8 @@
         <TextBlock TextWrapping="Wrap"
                    Text="{Binding NotifyText, ElementName=me, Mode=Default}"
                    FontFamily="/Notify;component/Resources/#Roboto" FontSize="20" Margin="0" VerticalAlignment="Top" Grid.Row="1" HorizontalAlignment="Center" Grid.ColumnSpan="2" Foreground="#FF3A7ABA" />
-        <Button Content="Update" Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Height="24" FontSize="12" FontFamily="/Notify;component/Resources/#Roboto" Width="58" Background="#FF3A7ABA" Foreground="#FFE7E7F2"/>
+        <Button Content="Update" Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Height="Auto" FontSize="12" FontFamily="/Notify;component/Resources/#Roboto" Background="#FF3A7ABA" Foreground="#FFE7E7F2" Click="Button_Click"/>
         <TextBlock TextWrapping="Wrap"
-            FontFamily="/Notify;component/Resources/#Roboto" FontSize="8" Margin="0,0,0,3" VerticalAlignment="Bottom" Grid.Row="1" HorizontalAlignment="Center" Grid.ColumnSpan="2" Foreground="#FF686868" Text="Application is updated, Would you wand update?" />
+            FontFamily="/Notify;component/Resources/#Roboto" FontSize="8" Margin="0,0,0,3" VerticalAlignment="Bottom" Grid.Row="1" HorizontalAlignment="Center" Grid.ColumnSpan="2" Foreground="#FF686868" ><Run Text="Application is updated, "/><Run Text="do "/><Run Text="you wan"/><Run Text="t"/><Run Text=" update?"/></TextBlock>
     </Grid>
 </UserControl>

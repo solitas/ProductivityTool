@@ -20,7 +20,8 @@ namespace ProductivityTool.Notify
 
             Interactions.QuestionUpdateApplication.RegisterHandlerForDialog(context =>
             {
-                var configView = new QuestionWindow
+                var name = context.Input;
+                var configView = new QuestionWindow(name)
                 {
                     WindowStartupLocation = WindowStartupLocation.CenterScreen
                 };

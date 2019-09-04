@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Input;
 using ReactiveUI;
@@ -36,6 +37,13 @@ namespace ProductivityTool.Notify.Model
         public ExternalLocalProgram()
         {
 
+            Execute = ReactiveCommand.Create(() =>
+            {
+                if (!string.IsNullOrEmpty(File))
+                {
+                    Process.Start(File);
+                }
+            });
         }
 
         public ExternalLocalProgram(string label)
@@ -48,11 +56,19 @@ namespace ProductivityTool.Notify.Model
                     var (program, dir) = x;
                     // TODO: validation check of executable file
                 });
+
+            Execute = ReactiveCommand.Create(() =>
+            {
+                if (!string.IsNullOrEmpty(File))
+                {
+                    Process.Start(File);
+                }
+            });
         }
 
-        public void NeedUpdate()
+        public void NeedUpdate(bool update, string orgFile = null)
         {
-            throw new System.NotImplementedException();
+
         }
 
         public void CheckUpdate()

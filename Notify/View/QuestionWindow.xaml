@@ -6,21 +6,23 @@
         xmlns:local="clr-namespace:ProductivityTool.Notify.View"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
-        Title="Yes or No" Height="200" Width="300">
+        Title="Yes or No" Height="165" Width="300" ResizeMode="NoResize" WindowStyle="None">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="10*"/>
-            <RowDefinition Height="3*"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" VerticalAlignment="Center" FontFamily="/Notify;component/Resources/#Roboto" FontSize="16" Grid.ColumnSpan="2" Margin="6,36">
-            <Run Text="변경사항이 존재합니다"/> <Run Text="변경하시겠습니까?"/><LineBreak/><Run/>
-        </TextBlock>
-        <Button x:Name="YesButton" Content="Yes" Grid.Row="1" IsDefault="True" Background="#FF8BB8F9" Click="YesButton_Click"/>
-        <Button x:Name="NoButton" Content="No" Grid.Row="1" Grid.Column="1" IsCancel="True" Background="#FFFFC1BF"/>
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock x:Name="AppNameBlock" Text="AppName" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,3,0" FontFamily="/Notify;component/Resources/#Roboto" FontWeight="Bold"/>
+            <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" VerticalAlignment="Center" FontFamily="/Notify;component/Resources/#Roboto" Grid.ColumnSpan="2" Margin="0" Text="is Changed."/>
+        </StackPanel>
+        <TextBlock Text="Application is updated, do you want update?" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,3,10" FontFamily="/Notify;component/Resources/#Roboto" Grid.ColumnSpan="2" FontSize="11" Foreground="#FF555454"/>
+        <Button x:Name="YesButton" Content="Yes" Grid.Row="1" IsDefault="True" Click="YesButton_Click" Margin="3" Style="{StaticResource MaterialDesignFlatButton}" Foreground="#FF152147" FontWeight="Bold" FontFamily="/Notify;component/Resources/#Roboto Medium"/>
+        <Button x:Name="NoButton" Content="No" Grid.Row="1" Grid.Column="1" IsCancel="True" Margin="3" Style="{StaticResource MaterialDesignFlatButton}" Foreground="#FF9B4E37" FontWeight="Bold" FontFamily="/Notify;component/Resources/#Roboto Medium"/>
 
     </Grid>
 </mah:MetroWindow>

@@ -41,6 +41,12 @@
     <Reference Include="DynamicData, Version=6.14.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\DynamicData.6.14.3\lib\net461\DynamicData.dll</HintPath>
     </Reference>
+    <Reference Include="MaterialDesignColors, Version=1.2.2.920, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MaterialDesignColors.1.2.2\lib\net45\MaterialDesignColors.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=3.0.1.920, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MaterialDesignThemes.3.0.1\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -100,6 +106,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ViewModel\DetailViewModel.cs" />
+    <Compile Include="View\MasterView.xaml.cs">
+      <DependentUpon>MasterView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\UserTaskDetailView.xaml.cs">
       <DependentUpon>UserTaskDetailView.xaml</DependentUpon>
     </Compile>
@@ -115,6 +124,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\MasterView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\UserTaskDetailView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -161,5 +174,7 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\Fody.6.0.6\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Fody.6.0.6\build\Fody.targets'))" />
     <Error Condition="!Exists('..\..\packages\ReactiveUI.Fody.11.1.6\build\ReactiveUI.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\ReactiveUI.Fody.11.1.6\build\ReactiveUI.Fody.props'))" />
+    <Error Condition="!Exists('..\..\packages\MaterialDesignThemes.3.0.1\build\MaterialDesignThemes.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MaterialDesignThemes.3.0.1\build\MaterialDesignThemes.targets'))" />
   </Target>
+  <Import Project="..\..\packages\MaterialDesignThemes.3.0.1\build\MaterialDesignThemes.targets" Condition="Exists('..\..\packages\MaterialDesignThemes.3.0.1\build\MaterialDesignThemes.targets')" />
 </Project>

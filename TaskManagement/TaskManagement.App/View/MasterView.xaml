@@ -1,31 +1,114 @@
-﻿<Window x:Class="TaskManagement.App.View.MasterView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TaskManagement.App.View"
-        mc:Ignorable="d"
-        Title="MasterView" Height="450" Width="800">
+﻿<local:MasterViewBase x:Class="TaskManagement.App.View.MasterView"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:local="clr-namespace:TaskManagement.App.View"
+                      xmlns:reactiveUi="http://reactiveui.net"
+                      xmlns:viewModel="clr-namespace:TaskManagement.Core.ViewModel;assembly=TaskManagement.Core"
+                      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                      xmlns:model="clr-namespace:TaskManagement.Core.Model;assembly=TaskManagement.Core"
+                      mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- note you only need bring in these extra resource dictionaries when using non-default styles, so only bring them into your controls where the default style is not what you want -->
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ComboBox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Slider.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.TextBox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Button.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.GroupBox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Popupbox.xaml" />
+
+            </ResourceDictionary.MergedDictionaries>
+            <ContextMenu x:Key="ListContextMenu">
+                <MenuItem Header="Modify" Command="{Binding Modify}"/>
+                <MenuItem Header="Delete" Command="{Binding Delete}"/>
+            </ContextMenu>
+            <DataTemplate x:Key="ListDataTemplate" DataType="model:UserTask" >
+                <Border>
+                    <TextBlock Text="{Binding Contents}"/>
+                </Border>
+            </DataTemplate>
+            <ItemsPanelTemplate x:Key="ListItemsPanelTemplate">
+                <StackPanel Background="#ffffff" ContextMenu="{StaticResource ListContextMenu}"></StackPanel>
+            </ItemsPanelTemplate>
+
+            <DataTemplate x:Key="HeaderDataTemplate">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <materialDesign:PackIcon
+                        Kind="AlertOctagram"
+                        Height="32"
+                        Width="32"
+                        VerticalAlignment="Center" />
+                    <TextBlock
+                        Margin="8,0,0,0"
+                        VerticalAlignment="Center"
+                        Style="{DynamicResource MaterialDesignSubtitle1TextBlock}"
+                        Text="{Binding}" 
+                        Grid.Column="1"/>
+                    <materialDesign:PopupBox
+                        HorizontalAlignment="Right"
+                        Style="{StaticResource MaterialDesignToolForegroundPopupBox}"
+                        Padding="2 0 2 0"
+                        Grid.ColumnSpan="3">
+                        <StackPanel>
+                            <Button Content="New Task" Command="{Binding Path=DataContext.Insert, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
+                            <Button Content="Save" Command="{Binding Path=DataContext.Save, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
+                            <Button Content="Exit" Command="{Binding Path=DataContext.Exit, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
+                        </StackPanel>
+                    </materialDesign:PopupBox>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <ListBox Grid.Row="0" Grid.Column="0">
-
-        </ListBox>
-        <ListBox Grid.Row="0" Grid.Column="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <!-- urgent / important : DO FIRST-->
+            <GroupBox Grid.Row="0" Grid.Column="0" Header="DO FIRST" 
+                      Background="#ffffff"
+                      Style="{DynamicResource MaterialDesignCardGroupBox}"
+                      Margin="5 6" HeaderTemplate="{StaticResource HeaderDataTemplate}">
+               
+                <ListBox x:Name="List1"  ItemsSource="{Binding UrgentImportantTasks}" SelectedItem="{Binding SelectedTask}"
+                         ItemTemplate="{StaticResource ListDataTemplate}"
+                         ItemsPanel="{StaticResource ListItemsPanelTemplate}"/>
+            </GroupBox>
+            <GroupBox Grid.Row="1" Grid.Column="0" Header="DELEGATE" 
+                      Style="{DynamicResource MaterialDesignCardGroupBox}"
+                      Margin="5 6" HeaderTemplate="{StaticResource HeaderDataTemplate}">
+                <ListBox x:Name="List2"  ItemsSource="{Binding UrgentLessImportantTasks}" SelectedItem="{Binding SelectedTask}"
+                         ItemTemplate="{StaticResource ListDataTemplate}"
+                         ItemsPanel="{StaticResource ListItemsPanelTemplate}"/>
+            </GroupBox>
             
-        </ListBox>
-        <ListBox Grid.Row="1" Grid.Column="0">
-
-        </ListBox>
-        <ListBox Grid.Row="1" Grid.Column="1">
-
-        </ListBox>
+            <GroupBox Grid.Row="0" Grid.Column="1" Header="LESS URGENT" 
+                      Style="{DynamicResource MaterialDesignCardGroupBox}"
+                      Margin="5 6" HeaderTemplate="{StaticResource HeaderDataTemplate}">
+                <ListBox x:Name="List3"  ItemsSource="{Binding LessUrgentImportantTasks}" SelectedItem="{Binding SelectedTask}"
+                         ItemTemplate="{StaticResource ListDataTemplate}"
+                         ItemsPanel="{StaticResource ListItemsPanelTemplate}"/>
+            </GroupBox>
+            <GroupBox Grid.Row="1" Grid.Column="1" Header="DON'T DO" 
+                      Style="{DynamicResource MaterialDesignCardGroupBox}"
+                      Margin="5 6" HeaderTemplate="{StaticResource HeaderDataTemplate}">
+                <ListBox x:Name="List4"  ItemsSource="{Binding LessUrgentLessImportantTasks}" SelectedItem="{Binding SelectedTask}"
+                         ItemTemplate="{StaticResource ListDataTemplate}"
+                         ItemsPanel="{StaticResource ListItemsPanelTemplate}"/>
+            </GroupBox>
+        </Grid>
     </Grid>
-</Window>
+</local:MasterViewBase>

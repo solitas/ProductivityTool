@@ -1,0 +1,67 @@
+﻿<reactiveUi:ReactiveWindow x:TypeArguments="viewModel:ITaskInsertViewModel"
+                           x:Class="TaskManagement.App.View.TaskInsertView"
+                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:local="clr-namespace:TaskManagement.App.View"
+                           xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                           xmlns:system="clr-namespace:System;assembly=mscorlib"
+                           xmlns:core="clr-namespace:TaskManagement.Core;assembly=TaskManagement.Core"
+                           xmlns:reactiveUi="http://reactiveui.net"
+                           xmlns:viewModel="clr-namespace:TaskManagement.Core.ViewModel;assembly=TaskManagement.Core"
+                           mc:Ignorable="d"
+                           Title="New Task" Height="300" Width="250">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- note you only need bring in these extra resource dictionaries when using non-default styles, so only bring them into your controls where the default style is not what you want -->
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ComboBox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Slider.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.TextBox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Button.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.GroupBox.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <ObjectDataProvider x:Key="UrgentLevelProvider" MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="core:UrgentLevel"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+            <ObjectDataProvider x:Key="ImportantLevelProvider" MethodName="GetValues"
+                                ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="core:ImportantLevel"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </ResourceDictionary>
+    </Window.Resources>
+    <GroupBox Header="New Task" Style="{DynamicResource MaterialDesignCardGroupBox}">
+        <Grid>
+            <StackPanel>
+                <TextBox Style="{DynamicResource MaterialDesignFloatingHintTextBox}"
+                         materialDesign:HintAssist.Hint="Input the task contents"
+                         Text="{Binding Task.Contents}"
+                         VerticalAlignment="Center"
+                         materialDesign:TextFieldAssist.HasClearButton="True"
+                         Margin="10,3">
+                </TextBox>
+                <ComboBox ItemsSource="{Binding Source={StaticResource UrgentLevelProvider}}"
+                          materialDesign:HintAssist.Hint="Urgent"
+                          materialDesign:TextFieldAssist.HasClearButton="True"
+                          Style="{DynamicResource MaterialDesignFloatingHintComboBox}"
+                          materialDesign:TextFieldAssist.SuffixText="LV" SelectedItem="{Binding Task.Urgent}" Margin="10,3">
+                </ComboBox>
+                <ComboBox ItemsSource="{Binding Source={StaticResource ImportantLevelProvider}}"
+                          materialDesign:HintAssist.Hint="Important"
+                          materialDesign:TextFieldAssist.HasClearButton="True"
+                          Style="{DynamicResource MaterialDesignFloatingHintComboBox}"
+                          materialDesign:TextFieldAssist.SuffixText="LV" SelectedItem="{Binding Task.Important}" Margin="10,3">
+                </ComboBox>
+                <Button Content="Accept" Margin="10 20 10 3" Command="{Binding Accept}" IsDefault="True"
+                        Style="{DynamicResource MaterialDesignFlatButton}"/>
+            </StackPanel>
+        </Grid>
+    </GroupBox>
+</reactiveUi:ReactiveWindow>

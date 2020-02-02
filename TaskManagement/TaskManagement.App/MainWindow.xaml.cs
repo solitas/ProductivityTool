@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TaskManagement.App.ViewModel;
+using TaskManagement.Core.ViewModel;
 
 namespace TaskManagement.App
 {
@@ -24,8 +25,23 @@ namespace TaskManagement.App
         public MainWindow()
         {
             InitializeComponent();
+            this.MouseDown += (o, e) =>
+            {
+                try
+                {
+                    DragMove();
+                }
+                catch
+                {
 
-            DetailView.ViewModel = new DetailViewModel();
+                }
+            };
+            DetailView.ViewModel = new MasterViewModel(ExitProgram);
+        }
+
+        private void ExitProgram()
+        {
+            Application.Current.Shutdown(0);
         }
     }
 }

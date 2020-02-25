@@ -9,9 +9,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Timer", "Timer\Timer.csproj
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TaskManagement", "TaskManagement", "{8C2A2076-B6D7-410E-8A4A-49A3DDFF2F28}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagement.Core", "TaskManagement\TaskManagement.Core\TaskManagement.Core.csproj", "{1AD4FE3E-A78B-495F-981A-11F8A7934410}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskManagement.Core", "TaskManagement\TaskManagement.Core\TaskManagement.Core.csproj", "{1AD4FE3E-A78B-495F-981A-11F8A7934410}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagement.App", "TaskManagement\TaskManagement.App\TaskManagement.App.csproj", "{D393F801-74DE-4EFE-B938-F30A8FE0B5B7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PythonCSharp", "PythonCSharp", "{DA42A628-C4B6-4AD0-AA0B-0FCF3E5AE79A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Script", "Script\Script.csproj", "{8115FB13-5F10-46BA-A88D-E8AAD479E608}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Designer", "Designer", "{147CCC53-08B5-4260-8DE9-3DCF64B02270}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Designer", "Designer\Designer.csproj", "{2F1707A7-42B8-4915-8CEB-8BA140512251}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModbusLib", "ModbusLib\ModbusLib.csproj", "{54564E0C-B9A1-4022-8C71-364362D907DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +45,18 @@ Global
 		{D393F801-74DE-4EFE-B938-F30A8FE0B5B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D393F801-74DE-4EFE-B938-F30A8FE0B5B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D393F801-74DE-4EFE-B938-F30A8FE0B5B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8115FB13-5F10-46BA-A88D-E8AAD479E608}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8115FB13-5F10-46BA-A88D-E8AAD479E608}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8115FB13-5F10-46BA-A88D-E8AAD479E608}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8115FB13-5F10-46BA-A88D-E8AAD479E608}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F1707A7-42B8-4915-8CEB-8BA140512251}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F1707A7-42B8-4915-8CEB-8BA140512251}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F1707A7-42B8-4915-8CEB-8BA140512251}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F1707A7-42B8-4915-8CEB-8BA140512251}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54564E0C-B9A1-4022-8C71-364362D907DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54564E0C-B9A1-4022-8C71-364362D907DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54564E0C-B9A1-4022-8C71-364362D907DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54564E0C-B9A1-4022-8C71-364362D907DC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -42,6 +64,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{1AD4FE3E-A78B-495F-981A-11F8A7934410} = {8C2A2076-B6D7-410E-8A4A-49A3DDFF2F28}
 		{D393F801-74DE-4EFE-B938-F30A8FE0B5B7} = {8C2A2076-B6D7-410E-8A4A-49A3DDFF2F28}
+		{8115FB13-5F10-46BA-A88D-E8AAD479E608} = {DA42A628-C4B6-4AD0-AA0B-0FCF3E5AE79A}
+		{2F1707A7-42B8-4915-8CEB-8BA140512251} = {147CCC53-08B5-4260-8DE9-3DCF64B02270}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4460DA4A-E765-4A36-8C1F-237B1B82C914}

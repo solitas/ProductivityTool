@@ -54,6 +54,6 @@ namespace TaskManagement.App
                 mainWindow.Width = compositionWidth;
                 mainWindow.Height = compositionHeight;
             }
-        }
+        }                                                                                                                                                                                                                                                                                                                                                                  
     }
 }
